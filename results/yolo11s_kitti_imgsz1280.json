@@ -1,0 +1,52 @@
+{
+  "model": "yolo11s",
+  "dataset": "kitti",
+  "n_images": 1496,
+  "config": {
+    "checkpoint": "yolo11s.pt",
+    "input_size": "imgsz=1280 (letterboxed)",
+    "conf_thresh": 0.001,
+    "nms_iou": 0.7,
+    "max_det": 100
+  },
+  "metrics": {
+    "3class_person_car_truck": {
+      "stats": {
+        "AP": 0.2621,
+        "AP50": 0.4969,
+        "AP75": 0.2447,
+        "AP_small": 0.2152,
+        "AP_medium": 0.2446,
+        "AP_large": 0.3546,
+        "AR1": 0.2231,
+        "AR10": 0.4328,
+        "AR100": 0.457,
+        "AR_small": 0.525,
+        "AR_medium": 0.4243,
+        "AR_large": 0.4964
+      },
+      "per_class_AP": {
+        "person": 0.197,
+        "car": 0.4582,
+        "truck": 0.1312
+      }
+    }
+  },
+  "latency_ms": {
+    "mean": 17.06,
+    "median": 14.91,
+    "p95": 26.93
+  },
+  "fps": 58.6,
+  "peak_gpu_mem_gb": 0.129,
+  "hardware": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "versions": {
+    "torch": "2.6.0+cu124",
+    "torchvision": "0.21.0+cu124",
+    "ultralytics": "8.4.198",
+    "pycocotools": "2.0.11",
+    "numpy": "2.5.4"
+  },
+  "python": "3.12.10",
+  "command": "python scripts/eval_detector.py --model yolo11s --dataset kitti --imgsz 1280"
+}

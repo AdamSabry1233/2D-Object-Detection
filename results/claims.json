@@ -1,0 +1,618 @@
+{
+  "n_images": {
+    "coco": 5000,
+    "kitti": 1496
+  },
+  "kitti_counts": {
+    "person": 921,
+    "car": 6271,
+    "truck": 223,
+    "ignore": 388
+  },
+  "size_dist": {
+    "coco": {
+      "n": 13109,
+      "small": 42.85605309329468,
+      "medium": 33.824090319627736,
+      "large": 23.31985658707758
+    },
+    "kitti": {
+      "n": 7415,
+      "small": 16.898179366149694,
+      "medium": 54.03910991233985,
+      "large": 29.062710721510456
+    }
+  },
+  "car_small_share": {
+    "coco": 62.20020855057351,
+    "kitti": 16.616169669909105
+  },
+  "ap3": {
+    "yolo11s_coco": 0.4631,
+    "yolo11s_kitti": 0.2411,
+    "rtdetr-l_coco": 0.5238,
+    "rtdetr-l_kitti": 0.285,
+    "frcnn_coco": 0.4181,
+    "frcnn_kitti": 0.2663
+  },
+  "drop_overall": {
+    "yolo11s": -47.9378104081192,
+    "rtdetr-l": -45.58991981672395,
+    "frcnn": -36.30710356374074
+  },
+  "rank": {
+    "coco": [
+      "rtdetr-l",
+      "yolo11s",
+      "frcnn"
+    ],
+    "kitti": [
+      "rtdetr-l",
+      "frcnn",
+      "yolo11s"
+    ]
+  },
+  "gap_rtdetr_frcnn_kitti": 0.018699999999999994,
+  "per_class": {
+    "yolo11s_coco_person": 0.5863,
+    "yolo11s_coco_car": 0.4483,
+    "yolo11s_coco_truck": 0.3547,
+    "yolo11s_kitti_person": 0.1955,
+    "yolo11s_kitti_car": 0.4375,
+    "yolo11s_kitti_truck": 0.0904,
+    "rtdetr-l_coco_person": 0.6154,
+    "rtdetr-l_coco_car": 0.4993,
+    "rtdetr-l_coco_truck": 0.4566,
+    "rtdetr-l_kitti_person": 0.2014,
+    "rtdetr-l_kitti_car": 0.4808,
+    "rtdetr-l_kitti_truck": 0.1727,
+    "frcnn_coco_person": 0.5182,
+    "frcnn_coco_car": 0.4111,
+    "frcnn_coco_truck": 0.325,
+    "frcnn_kitti_person": 0.2074,
+    "frcnn_kitti_car": 0.423,
+    "frcnn_kitti_truck": 0.1685
+  },
+  "drop_class": {
+    "yolo11s_person": -66.65529592358861,
+    "yolo11s_car": -2.4091010484050805,
+    "yolo11s_truck": -74.51367352692417,
+    "rtdetr-l_person": -67.27331816704582,
+    "rtdetr-l_car": -3.705187262167037,
+    "rtdetr-l_truck": -62.17696014016646,
+    "frcnn_person": -59.976842917792354,
+    "frcnn_car": 2.8946728289953696,
+    "frcnn_truck": -48.15384615384615
+  },
+  "drop_size": {
+    "yolo11s_small": -50.558961413631444,
+    "yolo11s_medium": -60.84142394822006,
+    "yolo11s_large": -48.62885857860732,
+    "rtdetr-l_small": -34.60176991150443,
+    "rtdetr-l_medium": -55.55373793554719,
+    "rtdetr-l_large": -46.36930837647683,
+    "frcnn_small": -2.2703457911281895,
+    "frcnn_medium": -49.62283384301733,
+    "frcnn_large": -34.3421755385437
+  },
+  "cells": [
+    {
+      "model": "yolo11s",
+      "cls": "person",
+      "size": "small",
+      "ap_coco": 0.3603,
+      "ap_kitti": 0.0242,
+      "drop_pct": -93.28337496530669,
+      "n_coco": 4308,
+      "n_kitti": 177,
+      "reliable": true
+    },
+    {
+      "model": "yolo11s",
+      "cls": "person",
+      "size": "medium",
+      "ap_coco": 0.6729,
+      "ap_kitti": 0.1805,
+      "drop_pct": -73.17580621191856,
+      "n_coco": 3723,
+      "n_kitti": 530,
+      "reliable": true
+    },
+    {
+      "model": "yolo11s",
+      "cls": "person",
+      "size": "large",
+      "ap_coco": 0.8112,
+      "ap_kitti": 0.3328,
+      "drop_pct": -58.97435897435898,
+      "n_coco": 2746,
+      "n_kitti": 214,
+      "reliable": true
+    },
+    {
+      "model": "yolo11s",
+      "cls": "car",
+      "size": "small",
+      "ap_coco": 0.3222,
+      "ap_kitti": 0.2652,
+      "drop_pct": -17.690875232774673,
+      "n_coco": 1193,
+      "n_kitti": 1042,
+      "reliable": true
+    },
+    {
+      "model": "yolo11s",
+      "cls": "car",
+      "size": "medium",
+      "ap_coco": 0.6387,
+      "ap_kitti": 0.405,
+      "drop_pct": -36.58994833255049,
+      "n_coco": 547,
+      "n_kitti": 3344,
+      "reliable": true
+    },
+    {
+      "model": "yolo11s",
+      "cls": "car",
+      "size": "large",
+      "ap_coco": 0.7387,
+      "ap_kitti": 0.5647,
+      "drop_pct": -23.554893732232305,
+      "n_coco": 178,
+      "n_kitti": 1885,
+      "reliable": true
+    },
+    {
+      "model": "yolo11s",
+      "cls": "truck",
+      "size": "small",
+      "ap_coco": 0.1496,
+      "ap_kitti": 0.1218,
+      "drop_pct": -18.582887700534762,
+      "n_coco": 117,
+      "n_kitti": 34,
+      "reliable": false
+    },
+    {
+      "model": "yolo11s",
+      "cls": "truck",
+      "size": "medium",
+      "ap_coco": 0.3572,
+      "ap_kitti": 0.0679,
+      "drop_pct": -80.99104143337065,
+      "n_coco": 164,
+      "n_kitti": 133,
+      "reliable": true
+    },
+    {
+      "model": "yolo11s",
+      "cls": "truck",
+      "size": "large",
+      "ap_coco": 0.5396,
+      "ap_kitti": 0.176,
+      "drop_pct": -67.38324684951816,
+      "n_coco": 133,
+      "n_kitti": 56,
+      "reliable": true
+    },
+    {
+      "model": "rtdetr-l",
+      "cls": "person",
+      "size": "small",
+      "ap_coco": 0.4028,
+      "ap_kitti": 0.0313,
+      "drop_pct": -92.22939424031777,
+      "n_coco": 4308,
+      "n_kitti": 177,
+      "reliable": true
+    },
+    {
+      "model": "rtdetr-l",
+      "cls": "person",
+      "size": "medium",
+      "ap_coco": 0.6903,
+      "ap_kitti": 0.1852,
+      "drop_pct": -73.17108503549181,
+      "n_coco": 3723,
+      "n_kitti": 530,
+      "reliable": true
+    },
+    {
+      "model": "rtdetr-l",
+      "cls": "person",
+      "size": "large",
+      "ap_coco": 0.8297,
+      "ap_kitti": 0.3448,
+      "drop_pct": -58.44281065445342,
+      "n_coco": 2746,
+      "n_kitti": 214,
+      "reliable": true
+    },
+    {
+      "model": "rtdetr-l",
+      "cls": "car",
+      "size": "small",
+      "ap_coco": 0.3835,
+      "ap_kitti": 0.332,
+      "drop_pct": -13.428943937418511,
+      "n_coco": 1193,
+      "n_kitti": 1042,
+      "reliable": true
+    },
+    {
+      "model": "rtdetr-l",
+      "cls": "car",
+      "size": "medium",
+      "ap_coco": 0.6605,
+      "ap_kitti": 0.4475,
+      "drop_pct": -32.24829674489023,
+      "n_coco": 547,
+      "n_kitti": 3344,
+      "reliable": true
+    },
+    {
+      "model": "rtdetr-l",
+      "cls": "car",
+      "size": "large",
+      "ap_coco": 0.8039,
+      "ap_kitti": 0.6103,
+      "drop_pct": -24.08259733797736,
+      "n_coco": 178,
+      "n_kitti": 1885,
+      "reliable": true
+    },
+    {
+      "model": "rtdetr-l",
+      "cls": "truck",
+      "size": "small",
+      "ap_coco": 0.2305,
+      "ap_kitti": 0.3018,
+      "drop_pct": 30.93275488069414,
+      "n_coco": 117,
+      "n_kitti": 34,
+      "reliable": false
+    },
+    {
+      "model": "rtdetr-l",
+      "cls": "truck",
+      "size": "medium",
+      "ap_coco": 0.4831,
+      "ap_kitti": 0.1825,
+      "drop_pct": -62.22314220658248,
+      "n_coco": 164,
+      "n_kitti": 133,
+      "reliable": true
+    },
+    {
+      "model": "rtdetr-l",
+      "cls": "truck",
+      "size": "large",
+      "ap_coco": 0.6261,
+      "ap_kitti": 0.2569,
+      "drop_pct": -58.968215939945686,
+      "n_coco": 133,
+      "n_kitti": 56,
+      "reliable": true
+    },
+    {
+      "model": "frcnn",
+      "cls": "person",
+      "size": "small",
+      "ap_coco": 0.349,
+      "ap_kitti": 0.0389,
+      "drop_pct": -88.8538681948424,
+      "n_coco": 4308,
+      "n_kitti": 177,
+      "reliable": true
+    },
+    {
+      "model": "frcnn",
+      "cls": "person",
+      "size": "medium",
+      "ap_coco": 0.5919,
+      "ap_kitti": 0.2019,
+      "drop_pct": -65.88950836289914,
+      "n_coco": 3723,
+      "n_kitti": 530,
+      "reliable": true
+    },
+    {
+      "model": "frcnn",
+      "cls": "person",
+      "size": "large",
+      "ap_coco": 0.6749,
+      "ap_kitti": 0.3368,
+      "drop_pct": -50.09631056452808,
+      "n_coco": 2746,
+      "n_kitti": 214,
+      "reliable": true
+    },
+    {
+      "model": "frcnn",
+      "cls": "car",
+      "size": "small",
+      "ap_coco": 0.3208,
+      "ap_kitti": 0.2538,
+      "drop_pct": -20.88528678304238,
+      "n_coco": 1193,
+      "n_kitti": 1042,
+      "reliable": true
+    },
+    {
+      "model": "frcnn",
+      "cls": "car",
+      "size": "medium",
+      "ap_coco": 0.5559,
+      "ap_kitti": 0.4043,
+      "drop_pct": -27.271091923007727,
+      "n_coco": 547,
+      "n_kitti": 3344,
+      "reliable": true
+    },
+    {
+      "model": "frcnn",
+      "cls": "car",
+      "size": "large",
+      "ap_coco": 0.5643,
+      "ap_kitti": 0.5506,
+      "drop_pct": -2.427786638312962,
+      "n_coco": 178,
+      "n_kitti": 1885,
+      "reliable": true
+    },
+    {
+      "model": "frcnn",
+      "cls": "truck",
+      "size": "small",
+      "ap_coco": 0.1893,
+      "ap_kitti": 0.5469,
+      "drop_pct": 188.90649762282095,
+      "n_coco": 117,
+      "n_kitti": 34,
+      "reliable": false
+    },
+    {
+      "model": "frcnn",
+      "cls": "truck",
+      "size": "medium",
+      "ap_coco": 0.3239,
+      "ap_kitti": 0.1352,
+      "drop_pct": -58.258721827724614,
+      "n_coco": 164,
+      "n_kitti": 133,
+      "reliable": true
+    },
+    {
+      "model": "frcnn",
+      "cls": "truck",
+      "size": "large",
+      "ap_coco": 0.446,
+      "ap_kitti": 0.2189,
+      "drop_pct": -50.91928251121076,
+      "n_coco": 133,
+      "n_kitti": 56,
+      "reliable": true
+    }
+  ],
+  "car_cells_dropping": [
+    9,
+    9
+  ],
+  "frcnn_kitti_truck": {
+    "small": 0.5469,
+    "medium": 0.1352,
+    "large": 0.2189,
+    "n_small": 34
+  },
+  "kitti_small_person_ap": {
+    "yolo11s": 0.0242,
+    "rtdetr-l": 0.0313,
+    "frcnn": 0.0389
+  },
+  "ap50_ap75": {
+    "yolo11s_coco": [
+      0.6569,
+      0.4987
+    ],
+    "yolo11s_kitti": [
+      0.4752,
+      0.2197
+    ],
+    "rtdetr-l_coco": [
+      0.7441,
+      0.5613
+    ],
+    "rtdetr-l_kitti": [
+      0.531,
+      0.2687
+    ],
+    "frcnn_coco": [
+      0.6883,
+      0.4381
+    ],
+    "frcnn_kitti": [
+      0.5198,
+      0.2449
+    ]
+  },
+  "ar100": {
+    "yolo11s_coco": 0.6062,
+    "yolo11s_kitti": 0.419,
+    "rtdetr-l_coco": 0.6941,
+    "rtdetr-l_kitti": 0.5351,
+    "frcnn_coco": 0.5836,
+    "frcnn_kitti": 0.505
+  },
+  "ap75_over_ap50": {
+    "yolo11s": [
+      0.7591718678642106,
+      0.4623316498316498
+    ],
+    "rtdetr-l": [
+      0.7543340948797205,
+      0.5060263653483992
+    ],
+    "frcnn": [
+      0.6364957140781635,
+      0.47114274721046556
+    ]
+  },
+  "person_drop_size": {
+    "yolo11s_small": -93.28337496530669,
+    "yolo11s_medium": -73.17580621191856,
+    "yolo11s_large": -58.97435897435898,
+    "rtdetr-l_small": -92.22939424031777,
+    "rtdetr-l_medium": -73.17108503549181,
+    "rtdetr-l_large": -58.44281065445342,
+    "frcnn_small": -88.8538681948424,
+    "frcnn_medium": -65.88950836289914,
+    "frcnn_large": -50.09631056452808
+  },
+  "ap80": {
+    "yolo11s": {
+      "measured": 0.4551,
+      "published": 0.47,
+      "diff": -0.014899999999999969
+    },
+    "rtdetr-l": {
+      "measured": 0.5258,
+      "published": 0.53,
+      "diff": -0.0041999999999999815
+    },
+    "frcnn": {
+      "measured": 0.3716,
+      "published": 0.37,
+      "diff": 0.0015999999999999903
+    }
+  },
+  "resolution": {
+    "w": 1242,
+    "h": 375,
+    "count": 1181,
+    "scale_ultralytics": 0.5152979066022544,
+    "scale_frcnn": 1.0732689210950082,
+    "ratio": 2.0828125,
+    "frcnn_hw": [
+      402,
+      1333
+    ]
+  },
+  "res1280": {
+    "ap_640": 0.2411,
+    "ap_1280": 0.2621,
+    "delta": 0.02099999999999999,
+    "delta_pct": 8.710078805474902,
+    "ap50": 0.4969,
+    "ap75": 0.2447,
+    "ap_small": 0.2152,
+    "ap_small_640": 0.1371,
+    "per_class": {
+      "person": 0.197,
+      "car": 0.4582,
+      "truck": 0.1312
+    },
+    "latency_ms": 17.06,
+    "fps": 58.6,
+    "mem": 0.129,
+    "gap_to_rtdetr": 0.022899999999999976,
+    "gap_to_frcnn": 0.0041999999999999815
+  },
+  "lat": {
+    "yolo11s_coco": {
+      "mean": 15.79,
+      "median": 14.24,
+      "p95": 24.4,
+      "fps": 63.3,
+      "mem": 0.126
+    },
+    "yolo11s_kitti": {
+      "mean": 18.8,
+      "median": 15.59,
+      "p95": 34.17,
+      "fps": 53.2,
+      "mem": 0.087
+    },
+    "yolo11s_change_pct": 19.062697910069677,
+    "rtdetr-l_coco": {
+      "mean": 34.77,
+      "median": 32.27,
+      "p95": 46.53,
+      "fps": 28.8,
+      "mem": 0.245
+    },
+    "rtdetr-l_kitti": {
+      "mean": 33.95,
+      "median": 32.08,
+      "p95": 43.13,
+      "fps": 29.5,
+      "mem": 0.245
+    },
+    "rtdetr-l_change_pct": -2.358354903652575,
+    "frcnn_coco": {
+      "mean": 93.94,
+      "median": 94.2,
+      "p95": 105.08,
+      "fps": 10.6,
+      "mem": 0.696
+    },
+    "frcnn_kitti": {
+      "mean": 63.09,
+      "median": 62.61,
+      "p95": 67.38,
+      "fps": 15.9,
+      "mem": 0.452
+    },
+    "frcnn_change_pct": -32.84011070896316
+  },
+  "speed": {
+    "coco": {
+      "rtdetr_over_yolo_latency": 2.2020265991133634,
+      "ap_gain_rtdetr_over_yolo": 0.06070000000000003,
+      "ap_gain_rtdetr_over_yolo_pct": 13.107320233210976,
+      "frcnn_over_rtdetr_latency": 2.701754385964912,
+      "ap_rtdetr_minus_frcnn": 0.10570000000000002,
+      "frcnn_over_yolo_latency": 5.949335022165928,
+      "rtdetr_faster_and_at_least_as_accurate_as_frcnn": true
+    },
+    "kitti": {
+      "rtdetr_over_yolo_latency": 1.8058510638297873,
+      "ap_gain_rtdetr_over_yolo": 0.04389999999999997,
+      "ap_gain_rtdetr_over_yolo_pct": 18.208212360016578,
+      "frcnn_over_rtdetr_latency": 1.858321060382916,
+      "ap_rtdetr_minus_frcnn": 0.018699999999999994,
+      "frcnn_over_yolo_latency": 3.355851063829787,
+      "rtdetr_faster_and_at_least_as_accurate_as_frcnn": true
+    }
+  },
+  "params": {
+    "yolo11s": 9.46,
+    "rtdetr-l": 32.97,
+    "frcnn": 41.76
+  },
+  "miss": {
+    "yolo11s": {
+      "small": 0.554,
+      "medium": 0.362,
+      "large": 0.176,
+      "person": 0.489,
+      "car": 0.304,
+      "truck": 0.744
+    },
+    "rtdetr-l": {
+      "small": 0.297,
+      "medium": 0.243,
+      "large": 0.153,
+      "person": 0.403,
+      "car": 0.191,
+      "truck": 0.471
+    },
+    "frcnn": {
+      "small": 0.223,
+      "medium": 0.227,
+      "large": 0.15,
+      "person": 0.347,
+      "car": 0.177,
+      "truck": 0.368
+    }
+  }
+}

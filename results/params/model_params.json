@@ -1,0 +1,17 @@
+{
+  "yolo11s": {
+    "params": 9458752,
+    "params_M": 9.46,
+    "fp32_weights_MB": 37.8
+  },
+  "rtdetr-l": {
+    "params": 32970476,
+    "params_M": 32.97,
+    "fp32_weights_MB": 131.9
+  },
+  "frcnn": {
+    "params": 41755286,
+    "params_M": 41.76,
+    "fp32_weights_MB": 167.0
+  }
+}

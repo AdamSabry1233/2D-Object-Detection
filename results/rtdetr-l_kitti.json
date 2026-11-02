@@ -1,0 +1,52 @@
+{
+  "model": "rtdetr-l",
+  "dataset": "kitti",
+  "n_images": 1496,
+  "config": {
+    "checkpoint": "rtdetr-l.pt",
+    "input_size": "imgsz=640 (letterboxed)",
+    "conf_thresh": 0.001,
+    "nms_iou": null,
+    "max_det": 100
+  },
+  "metrics": {
+    "3class_person_car_truck": {
+      "stats": {
+        "AP": 0.285,
+        "AP50": 0.531,
+        "AP75": 0.2687,
+        "AP_small": 0.2217,
+        "AP_medium": 0.2717,
+        "AP_large": 0.404,
+        "AR1": 0.2336,
+        "AR10": 0.5051,
+        "AR100": 0.5351,
+        "AR_small": 0.5109,
+        "AR_medium": 0.5069,
+        "AR_large": 0.623
+      },
+      "per_class_AP": {
+        "person": 0.2014,
+        "car": 0.4808,
+        "truck": 0.1727
+      }
+    }
+  },
+  "latency_ms": {
+    "mean": 33.95,
+    "median": 32.08,
+    "p95": 43.13
+  },
+  "fps": 29.5,
+  "peak_gpu_mem_gb": 0.245,
+  "hardware": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "versions": {
+    "torch": "2.6.0+cu124",
+    "torchvision": "0.21.0+cu124",
+    "ultralytics": "8.4.198",
+    "pycocotools": "2.0.11",
+    "numpy": "2.5.4"
+  },
+  "python": "3.12.10",
+  "command": "python scripts/eval_detector.py --model rtdetr-l --dataset kitti"
+}
