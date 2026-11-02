@@ -1,0 +1,104 @@
+{
+  "003554": {
+    "yolo11s": {
+      "correct": 1,
+      "fp": 0,
+      "missed": 13
+    },
+    "rtdetr-l": {
+      "correct": 10,
+      "fp": 2,
+      "missed": 4
+    },
+    "frcnn": {
+      "correct": 8,
+      "fp": 14,
+      "missed": 6
+    }
+  },
+  "003219": {
+    "yolo11s": {
+      "correct": 10,
+      "fp": 3,
+      "missed": 10
+    },
+    "rtdetr-l": {
+      "correct": 12,
+      "fp": 2,
+      "missed": 8
+    },
+    "frcnn": {
+      "correct": 16,
+      "fp": 19,
+      "missed": 4
+    }
+  },
+  "000018": {
+    "yolo11s": {
+      "correct": 1,
+      "fp": 10,
+      "missed": 1
+    },
+    "rtdetr-l": {
+      "correct": 1,
+      "fp": 11,
+      "missed": 1
+    },
+    "frcnn": {
+      "correct": 2,
+      "fp": 26,
+      "missed": 0
+    }
+  },
+  "006255": {
+    "yolo11s": {
+      "correct": 1,
+      "fp": 8,
+      "missed": 1
+    },
+    "rtdetr-l": {
+      "correct": 1,
+      "fp": 10,
+      "missed": 1
+    },
+    "frcnn": {
+      "correct": 1,
+      "fp": 28,
+      "missed": 1
+    }
+  },
+  "005226": {
+    "yolo11s": {
+      "correct": 5,
+      "fp": 3,
+      "missed": 11
+    },
+    "rtdetr-l": {
+      "correct": 6,
+      "fp": 7,
+      "missed": 10
+    },
+    "frcnn": {
+      "correct": 5,
+      "fp": 13,
+      "missed": 11
+    }
+  },
+  "005245": {
+    "yolo11s": {
+      "correct": 6,
+      "fp": 2,
+      "missed": 10
+    },
+    "rtdetr-l": {
+      "correct": 6,
+      "fp": 7,
+      "missed": 10
+    },
+    "frcnn": {
+      "correct": 7,
+      "fp": 15,
+      "missed": 9
+    }
+  }
+}

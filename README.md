@@ -57,7 +57,7 @@ Datasets, weights and raw detections (`C:/dev/runs/*_dets.json`) are not in this
 - Scoring: pycocotools `COCOeval`, bbox. On COCO we report both the standard 80-class result and the 3-class result. On KITTI we report the 3-class result.
 - Confidence threshold 0.001, at most 100 detections per image.
 - NMS IoU: 0.7 for YOLO11s, 0.5 for Faster R-CNN, none for RT-DETR-L.
-- Input resolution: YOLO11s and RT-DETR-L use `imgsz=640` (letterboxed). Faster R-CNN uses torchvision's internal resize (min side 800, max side 1333). So the models see KITTI at different effective scales; this is a confound for architecture comparisons.
+- Input handling differs by model. YOLO11s (`imgsz=640`) is letterboxed with an aspect-preserving rectangle and minimal padding. RT-DETR-L (`imgsz=640`) is **not** letterboxed: Ultralytics' RT-DETR predictor sets `scale_fill = True`, so every image is stretched to 640x640 with no padding and the aspect ratio is not preserved. Faster R-CNN uses torchvision's internal resize (min side 800, max side 1333). The three models therefore see KITTI at three different effective inputs, which confounds every pairwise comparison. The measured input shapes are in `results/input_shapes.json` (made by `scripts/measure_input_shapes.py`). The `input_size` field in the RT-DETR-L result JSONs says "letterboxed", which is inaccurate; result files were not modified.
 - Latency: mean per-image time of preprocessing + model + NMS + copy to CPU (`predict()` for Ultralytics, forward pass plus copy for torchvision), after 10 warmup images. Image decoding is not timed. Measured on a 45 W power-limited laptop GPU, so small differences are noise.
 - Peak GPU memory: `torch.cuda.max_memory_allocated()` (tensor allocations only; excludes the CUDA context).
 - Ultralytics outputs class ids 0-79; the code maps them to COCO's 1-90 ids (`COCO80_TO_91` in `scripts/eval_detector.py`).
@@ -67,7 +67,7 @@ Datasets, weights and raw detections (`C:/dev/runs/*_dets.json`) are not in this
 ```
 scripts/        evaluation, conversion, analysis, plotting and report-building code
 annotations/    kitti_val_coco.json (KITTI val in COCO format)
-results/        one JSON per run (metrics, latency, memory, config, versions, command), summary.csv, class_size_ap.csv, params/
+results/        one JSON per run (metrics, latency, memory, config, versions, command), summary.csv, class_size_ap.csv (4 decimals), class_size_ap_full.csv (unrounded), input_shapes.json, claims.json, params/
 figures/        fig1-3 PNGs; failures/ (all candidate failure figures); report/ (the 6 used in the report, SELECTION.md)
 docs/           references.md, claims_ledger.md
 report/         report PDF and its HTML source
@@ -85,4 +85,5 @@ See `COMMANDS.md`. Each `results/*.json` has the exact command in its `command` 
 - Van is merged into car; cyclist and sitting person are ignore regions; tram and misc are dropped.
 - Object-size buckets differ across datasets: COCO area comes from segmentation masks, the converted KITTI file uses box area.
 - No confidence intervals were computed, so small AP differences between models are not established.
+- A single score cutoff (0.4) in the failure analysis is not the same operating point for every model, because scores are calibrated differently.
 - No training was done, so there is no train/val leakage concern for the KITTI val split.

@@ -43,7 +43,7 @@ Statuses: MEASURED = read directly from a result file; DERIVED = computed from r
 | RT-DETR-L AP75/AP50 ratio on COCO vs KITTI (3-class; lower = relatively looser boxes) | results/rtdetr-l_coco.json, rtdetr-l_kitti.json | 0.75 vs 0.51 | DERIVED |
 | Faster R-CNN AP75/AP50 ratio on COCO vs KITTI (3-class; lower = relatively looser boxes) | results/frcnn_coco.json, frcnn_kitti.json | 0.64 vs 0.47 | DERIVED |
 | YOLO11s small-person AP, COCO -> KITTI (n_coco=4308, n_kitti=177) | results/class_size_ap.csv | 0.360 -> 0.024 (-93.3%) | DERIVED |
-| YOLO11s medium-person AP, COCO -> KITTI (n_coco=3723, n_kitti=530) | results/class_size_ap.csv | 0.673 -> 0.180 (-73.2%) | DERIVED |
+| YOLO11s medium-person AP, COCO -> KITTI (n_coco=3723, n_kitti=530) | results/class_size_ap.csv | 0.673 -> 0.181 (-73.2%) | DERIVED |
 | YOLO11s large-person AP, COCO -> KITTI (n_coco=2746, n_kitti=214) | results/class_size_ap.csv | 0.811 -> 0.333 (-59.0%) | DERIVED |
 | RT-DETR-L small-person AP, COCO -> KITTI (n_coco=4308, n_kitti=177) | results/class_size_ap.csv | 0.403 -> 0.031 (-92.2%) | DERIVED |
 | RT-DETR-L medium-person AP, COCO -> KITTI (n_coco=3723, n_kitti=530) | results/class_size_ap.csv | 0.690 -> 0.185 (-73.2%) | DERIVED |
@@ -51,6 +51,7 @@ Statuses: MEASURED = read directly from a result file; DERIVED = computed from r
 | Faster R-CNN small-person AP, COCO -> KITTI (n_coco=4308, n_kitti=177) | results/class_size_ap.csv | 0.349 -> 0.039 (-88.9%) | DERIVED |
 | Faster R-CNN medium-person AP, COCO -> KITTI (n_coco=3723, n_kitti=530) | results/class_size_ap.csv | 0.592 -> 0.202 (-65.9%) | DERIVED |
 | Faster R-CNN large-person AP, COCO -> KITTI (n_coco=2746, n_kitti=214) | results/class_size_ap.csv | 0.675 -> 0.337 (-50.1%) | DERIVED |
+| Correct / false-positive / missed counts per model for the six selected failure images (score>=0.4, IoU>=0.5) | figures/report/counts.json (scripts/make_report_failures.py) | 6 images x 3 models | MEASURED |
 | AP, AP50, AP75, AP small/medium/large, AR100 and per-class AP for every model and dataset (results tables) | results/<model>_<dataset>.json (also results/summary.csv) | read directly | MEASURED |
 | Per class x size AP and object counts for every model and dataset (class x size table) | results/class_size_ap.csv | read directly | MEASURED |
 | Mean/median/p95 latency, FPS and peak GPU memory for every model and dataset | results/<model>_<dataset>.json | read directly | MEASURED |
@@ -58,7 +59,12 @@ Statuses: MEASURED = read directly from a result file; DERIVED = computed from r
 | YOLO11s 80-class COCO AP: measured vs published | results/yolo11s_coco.json, docs/published_map.json | 0.455 vs 0.470 (diff -0.015) | DERIVED |
 | RT-DETR-L 80-class COCO AP: measured vs published | results/rtdetr-l_coco.json, docs/published_map.json | 0.526 vs 0.530 (diff -0.004) | DERIVED |
 | Faster R-CNN 80-class COCO AP: measured vs published | results/frcnn_coco.json, docs/published_map.json | 0.372 vs 0.370 (diff +0.002) | DERIVED |
-| Most common KITTI image size 1242x375 (1181 of 1496 images): scale to 640 letterbox / Faster R-CNN resize / ratio | annotations/kitti_val_coco.json (image sizes) + resize rules in scripts/eval_detector.py and torchvision defaults | 0.52 / 1.07 / 2.1x | DERIVED |
+| Network input per model for one 1242x375 KITTI image (000001.png): YOLO11s 640 / YOLO11s 1280 / RT-DETR-L / Faster R-CNN (height x width; Faster R-CNN resized size, tensor padded) | results/input_shapes.json (scripts/measure_input_shapes.py); ultralytics/models/rtdetr/predict.py scale_fill | 224x640 / 416x1280 / 640x640 (stretched, scale_fill=True) / 402x1333 (tensor 416x1344) | MEASURED |
+| Scale factor (horizontal / vertical) from the original image: YOLO11s 640 / YOLO11s 1280 / RT-DETR-L / Faster R-CNN | results/input_shapes.json | 0.52/0.52 / 1.03/1.03 / 0.52/1.71 / 1.07/1.07 | DERIVED |
+| Network input pixels: YOLO11s 640 / YOLO11s 1280 / RT-DETR-L / Faster R-CNN (padded tensors) | results/input_shapes.json | 143,360 / 532,480 / 409,600 / 559,104 | DERIVED |
+| YOLO11s 1280 input pixels relative to RT-DETR-L 640 (and 640-run relative); absolute differences; 1280 closer than 640 | results/input_shapes.json | 1.30x (640: 0.35x); 122,880 vs 266,240; True | DERIVED |
+| YOLO11s 1280 input pixels relative to Faster R-CNN | results/input_shapes.json | 0.95x | DERIVED |
+| YOLO11s KITTI per-class AP at imgsz 640 -> 1280 (person / car / truck; single run) | results/yolo11s_kitti.json, yolo11s_kitti_imgsz1280.json | person 0.196 -> 0.197 (+0.002); car 0.438 -> 0.458 (+0.021); truck 0.090 -> 0.131 (+0.041) | DERIVED |
 | YOLO11s KITTI 3-class AP at imgsz 640 -> 1280 | results/yolo11s_kitti.json, yolo11s_kitti_imgsz1280.json | 0.241 -> 0.262 (+0.021, +8.7%) | DERIVED |
 | KITTI AP gap that remains at imgsz 1280 vs RT-DETR-L and vs Faster R-CNN | results/*_kitti*.json | +0.023 / +0.004 | DERIVED |
 | YOLO11s KITTI mean latency at 640 vs 1280 (not comparable, see report) | results/yolo11s_kitti.json, yolo11s_kitti_imgsz1280.json | 18.8 ms vs 17.06 ms | UNVERIFIED |
@@ -77,7 +83,7 @@ Statuses: MEASURED = read directly from a result file; DERIVED = computed from r
 | RT-DETR-L KITTI miss rate small/medium/large then person/car/truck (score>=0.4, IoU>=0.5) | figures/failures/miss_rates.csv | 0.297 / 0.243 / 0.153 then 0.403 / 0.191 / 0.471 | MEASURED |
 | Faster R-CNN KITTI miss rate small/medium/large then person/car/truck (score>=0.4, IoU>=0.5) | figures/failures/miss_rates.csv | 0.223 / 0.227 / 0.150 then 0.347 / 0.177 / 0.368 | MEASURED |
 | Car AP looks flat overall partly because the small-car share differs strongly between datasets (see car_small_share) | results/class_size_ap.csv | not isolated by an experiment | HYPOTHESIS |
-| Faster R-CNN's smaller KITTI drop is partly due to its larger input scale on KITTI (see res_scale); the 1280 run tests this only for YOLO11s | results/yolo11s_kitti_imgsz1280.json | partially tested, not isolated | HYPOTHESIS |
+| Faster R-CNN's smaller KITTI drop is partly due to its different effective input on KITTI (see input_shapes); the 1280 run tests this only for YOLO11s | results/yolo11s_kitti_imgsz1280.json | partially tested, not isolated | HYPOTHESIS |
 | Many false positives in the selected failure figures are real but unlabeled objects (Ultralytics KITTI has no DontCare regions) | figures/report/SELECTION.md | visual judgement only | HYPOTHESIS |
 | Size buckets differ across datasets: COCO area from segmentation masks, converted KITTI from box area | annotations/kitti_val_coco.json, COCO instances_val2017.json | by construction | MEASURED |
 | AR@1 differs between the 80-class and 3-class tables because maxDets is capped per image per class; compare AR@100 | results/*_coco.json | by construction | MEASURED |

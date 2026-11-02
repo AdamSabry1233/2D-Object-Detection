@@ -56,8 +56,9 @@ Writes `results/yolo11s_kitti_imgsz1280.json`. Its latency is not comparable to 
 ```bash
 python scripts/count_params.py                 # results/params/model_params.json
 python scripts/summarize.py                    # results/summary.csv
-python scripts/class_size_breakdown.py         # results/class_size_ap.csv  (printed table: results/class_size_table.txt)
+python scripts/class_size_breakdown.py         # results/class_size_ap.csv, results/class_size_ap_full.csv (unrounded)  (printed table: results/class_size_table.txt)
 python scripts/failure_analysis.py             # figures/failures/*  (defaults: score >= 0.4, IoU >= 0.5; printed table: figures/failures/miss_rates.txt)
+python scripts/measure_input_shapes.py         # results/input_shapes.json (real network input shape per model on one KITTI image)
 python scripts/make_plots.py                   # figures/fig1-3
 python scripts/make_report_failures.py         # figures/report/compact/* (report-sized versions of the 6 chosen failure figures in figures/report/)
 ```
