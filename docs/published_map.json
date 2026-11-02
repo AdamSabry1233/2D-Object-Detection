@@ -1,0 +1,5 @@
+{
+  "yolo11s": {"mAP_50_95": 47.0, "source": "https://docs.ultralytics.com/models/yolo11/", "note": "imgsz 640; page labels table 'Detection (COCO)', split not named"},
+  "rtdetr-l": {"mAP_50_95": 53.0, "source": "https://docs.ultralytics.com/models/rtdetr/", "note": "page states COCO val2017"},
+  "frcnn": {"mAP_50_95": 37.0, "source": "torchvision FasterRCNN_ResNet50_FPN_Weights.COCO_V1.meta['_metrics']['COCO-val2017']['box_map'] (torchvision 0.21.0)", "note": "https://docs.pytorch.org/vision/stable/models/faster_rcnn.html"}
+}
