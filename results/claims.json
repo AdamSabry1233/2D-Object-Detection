@@ -100,9 +100,9 @@
       "model": "yolo11s",
       "cls": "person",
       "size": "small",
-      "ap_coco": 0.3603,
-      "ap_kitti": 0.0242,
-      "drop_pct": -93.28337496530669,
+      "ap_coco": 0.36030898345726586,
+      "ap_kitti": 0.024190516099378067,
+      "drop_pct": -93.28617458625004,
       "n_coco": 4308,
       "n_kitti": 177,
       "reliable": true
@@ -111,9 +111,9 @@
       "model": "yolo11s",
       "cls": "person",
       "size": "medium",
-      "ap_coco": 0.6729,
-      "ap_kitti": 0.1805,
-      "drop_pct": -73.17580621191856,
+      "ap_coco": 0.6728753022580563,
+      "ap_kitti": 0.18054340053740983,
+      "drop_pct": -73.16837162375606,
       "n_coco": 3723,
       "n_kitti": 530,
       "reliable": true
@@ -122,9 +122,9 @@
       "model": "yolo11s",
       "cls": "person",
       "size": "large",
-      "ap_coco": 0.8112,
-      "ap_kitti": 0.3328,
-      "drop_pct": -58.97435897435898,
+      "ap_coco": 0.811215830421359,
+      "ap_kitti": 0.3328277758836193,
+      "drop_pct": -58.97173558475271,
       "n_coco": 2746,
       "n_kitti": 214,
       "reliable": true
@@ -133,9 +133,9 @@
       "model": "yolo11s",
       "cls": "car",
       "size": "small",
-      "ap_coco": 0.3222,
-      "ap_kitti": 0.2652,
-      "drop_pct": -17.690875232774673,
+      "ap_coco": 0.32218086408864016,
+      "ap_kitti": 0.2652421871238245,
+      "drop_pct": -17.67289225133817,
       "n_coco": 1193,
       "n_kitti": 1042,
       "reliable": true
@@ -144,9 +144,9 @@
       "model": "yolo11s",
       "cls": "car",
       "size": "medium",
-      "ap_coco": 0.6387,
-      "ap_kitti": 0.405,
-      "drop_pct": -36.58994833255049,
+      "ap_coco": 0.6386821207724589,
+      "ap_kitti": 0.4049584086962785,
+      "drop_pct": -36.594685286242466,
       "n_coco": 547,
       "n_kitti": 3344,
       "reliable": true
@@ -155,9 +155,9 @@
       "model": "yolo11s",
       "cls": "car",
       "size": "large",
-      "ap_coco": 0.7387,
-      "ap_kitti": 0.5647,
-      "drop_pct": -23.554893732232305,
+      "ap_coco": 0.7386902156381052,
+      "ap_kitti": 0.5647060810583241,
+      "drop_pct": -23.55305795264769,
       "n_coco": 178,
       "n_kitti": 1885,
       "reliable": true
@@ -166,9 +166,9 @@
       "model": "yolo11s",
       "cls": "truck",
       "size": "small",
-      "ap_coco": 0.1496,
-      "ap_kitti": 0.1218,
-      "drop_pct": -18.582887700534762,
+      "ap_coco": 0.14955767602696116,
+      "ap_kitti": 0.12182485009773944,
+      "drop_pct": -18.543231391361182,
       "n_coco": 117,
       "n_kitti": 34,
       "reliable": false
@@ -177,9 +177,9 @@
       "model": "yolo11s",
       "cls": "truck",
       "size": "medium",
-      "ap_coco": 0.3572,
-      "ap_kitti": 0.0679,
-      "drop_pct": -80.99104143337065,
+      "ap_coco": 0.35719025735846327,
+      "ap_kitti": 0.0678618870992195,
+      "drop_pct": -81.0011931453338,
       "n_coco": 164,
       "n_kitti": 133,
       "reliable": true
@@ -188,9 +188,9 @@
       "model": "yolo11s",
       "cls": "truck",
       "size": "large",
-      "ap_coco": 0.5396,
-      "ap_kitti": 0.176,
-      "drop_pct": -67.38324684951816,
+      "ap_coco": 0.5396232913735951,
+      "ap_kitti": 0.1759524701149786,
+      "drop_pct": -67.39346263814951,
       "n_coco": 133,
       "n_kitti": 56,
       "reliable": true
@@ -199,9 +199,9 @@
       "model": "rtdetr-l",
       "cls": "person",
       "size": "small",
-      "ap_coco": 0.4028,
-      "ap_kitti": 0.0313,
-      "drop_pct": -92.22939424031777,
+      "ap_coco": 0.4028180119281958,
+      "ap_kitti": 0.031272353845630665,
+      "drop_pct": -92.23660488865997,
       "n_coco": 4308,
       "n_kitti": 177,
       "reliable": true
@@ -210,9 +210,9 @@
       "model": "rtdetr-l",
       "cls": "person",
       "size": "medium",
-      "ap_coco": 0.6903,
-      "ap_kitti": 0.1852,
-      "drop_pct": -73.17108503549181,
+      "ap_coco": 0.6903312883389355,
+      "ap_kitti": 0.1852004076590045,
+      "drop_pct": -73.17224196738485,
       "n_coco": 3723,
       "n_kitti": 530,
       "reliable": true
@@ -221,9 +221,9 @@
       "model": "rtdetr-l",
       "cls": "person",
       "size": "large",
-      "ap_coco": 0.8297,
-      "ap_kitti": 0.3448,
-      "drop_pct": -58.44281065445342,
+      "ap_coco": 0.8296881349482949,
+      "ap_kitti": 0.3447582880360118,
+      "drop_pct": -58.44724378787257,
       "n_coco": 2746,
       "n_kitti": 214,
       "reliable": true
@@ -232,9 +232,9 @@
       "model": "rtdetr-l",
       "cls": "car",
       "size": "small",
-      "ap_coco": 0.3835,
-      "ap_kitti": 0.332,
-      "drop_pct": -13.428943937418511,
+      "ap_coco": 0.3835160872594647,
+      "ap_kitti": 0.3320426991950659,
+      "drop_pct": -13.421441700716683,
       "n_coco": 1193,
       "n_kitti": 1042,
       "reliable": true
@@ -243,9 +243,9 @@
       "model": "rtdetr-l",
       "cls": "car",
       "size": "medium",
-      "ap_coco": 0.6605,
-      "ap_kitti": 0.4475,
-      "drop_pct": -32.24829674489023,
+      "ap_coco": 0.6604752730781134,
+      "ap_kitti": 0.44745891198520255,
+      "drop_pct": -32.25198122863227,
       "n_coco": 547,
       "n_kitti": 3344,
       "reliable": true
@@ -254,9 +254,9 @@
       "model": "rtdetr-l",
       "cls": "car",
       "size": "large",
-      "ap_coco": 0.8039,
-      "ap_kitti": 0.6103,
-      "drop_pct": -24.08259733797736,
+      "ap_coco": 0.8039414890640512,
+      "ap_kitti": 0.6103455498210989,
+      "drop_pct": -24.08084939966672,
       "n_coco": 178,
       "n_kitti": 1885,
       "reliable": true
@@ -265,9 +265,9 @@
       "model": "rtdetr-l",
       "cls": "truck",
       "size": "small",
-      "ap_coco": 0.2305,
-      "ap_kitti": 0.3018,
-      "drop_pct": 30.93275488069414,
+      "ap_coco": 0.2305240183360862,
+      "ap_kitti": 0.3017992516294697,
+      "drop_pct": 30.918788336176622,
       "n_coco": 117,
       "n_kitti": 34,
       "reliable": false
@@ -276,9 +276,9 @@
       "model": "rtdetr-l",
       "cls": "truck",
       "size": "medium",
-      "ap_coco": 0.4831,
-      "ap_kitti": 0.1825,
-      "drop_pct": -62.22314220658248,
+      "ap_coco": 0.4831495947855764,
+      "ap_kitti": 0.18253264445701262,
+      "drop_pct": -62.22026336625175,
       "n_coco": 164,
       "n_kitti": 133,
       "reliable": true
@@ -287,9 +287,9 @@
       "model": "rtdetr-l",
       "cls": "truck",
       "size": "large",
-      "ap_coco": 0.6261,
-      "ap_kitti": 0.2569,
-      "drop_pct": -58.968215939945686,
+      "ap_coco": 0.6261330537337708,
+      "ap_kitti": 0.256906007847396,
+      "drop_pct": -58.96942250286769,
       "n_coco": 133,
       "n_kitti": 56,
       "reliable": true
@@ -298,9 +298,9 @@
       "model": "frcnn",
       "cls": "person",
       "size": "small",
-      "ap_coco": 0.349,
-      "ap_kitti": 0.0389,
-      "drop_pct": -88.8538681948424,
+      "ap_coco": 0.34898962367669517,
+      "ap_kitti": 0.03886791861269695,
+      "drop_pct": -88.86272944071705,
       "n_coco": 4308,
       "n_kitti": 177,
       "reliable": true
@@ -309,9 +309,9 @@
       "model": "frcnn",
       "cls": "person",
       "size": "medium",
-      "ap_coco": 0.5919,
-      "ap_kitti": 0.2019,
-      "drop_pct": -65.88950836289914,
+      "ap_coco": 0.5918721311085844,
+      "ap_kitti": 0.2018615919453957,
+      "drop_pct": -65.89439148498067,
       "n_coco": 3723,
       "n_kitti": 530,
       "reliable": true
@@ -320,9 +320,9 @@
       "model": "frcnn",
       "cls": "person",
       "size": "large",
-      "ap_coco": 0.6749,
-      "ap_kitti": 0.3368,
-      "drop_pct": -50.09631056452808,
+      "ap_coco": 0.674899611905306,
+      "ap_kitti": 0.3368304320274367,
+      "drop_pct": -50.091772748760036,
       "n_coco": 2746,
       "n_kitti": 214,
       "reliable": true
@@ -331,9 +331,9 @@
       "model": "frcnn",
       "cls": "car",
       "size": "small",
-      "ap_coco": 0.3208,
-      "ap_kitti": 0.2538,
-      "drop_pct": -20.88528678304238,
+      "ap_coco": 0.3207674874807288,
+      "ap_kitti": 0.25376693572469267,
+      "drop_pct": -20.88757569610649,
       "n_coco": 1193,
       "n_kitti": 1042,
       "reliable": true
@@ -342,9 +342,9 @@
       "model": "frcnn",
       "cls": "car",
       "size": "medium",
-      "ap_coco": 0.5559,
-      "ap_kitti": 0.4043,
-      "drop_pct": -27.271091923007727,
+      "ap_coco": 0.5559199007340345,
+      "ap_kitti": 0.4043040043319818,
+      "drop_pct": -27.27297515376939,
       "n_coco": 547,
       "n_kitti": 3344,
       "reliable": true
@@ -353,9 +353,9 @@
       "model": "frcnn",
       "cls": "car",
       "size": "large",
-      "ap_coco": 0.5643,
-      "ap_kitti": 0.5506,
-      "drop_pct": -2.427786638312962,
+      "ap_coco": 0.5643408602981416,
+      "ap_kitti": 0.5506150990865502,
+      "drop_pct": -2.4321756897666575,
       "n_coco": 178,
       "n_kitti": 1885,
       "reliable": true
@@ -364,9 +364,9 @@
       "model": "frcnn",
       "cls": "truck",
       "size": "small",
-      "ap_coco": 0.1893,
-      "ap_kitti": 0.5469,
-      "drop_pct": 188.90649762282095,
+      "ap_coco": 0.18926446331176924,
+      "ap_kitti": 0.5468918550584383,
+      "drop_pct": 188.95643983496308,
       "n_coco": 117,
       "n_kitti": 34,
       "reliable": false
@@ -375,9 +375,9 @@
       "model": "frcnn",
       "cls": "truck",
       "size": "medium",
-      "ap_coco": 0.3239,
-      "ap_kitti": 0.1352,
-      "drop_pct": -58.258721827724614,
+      "ap_coco": 0.32385470039130976,
+      "ap_kitti": 0.1351871387290192,
+      "drop_pct": -58.25685451973549,
       "n_coco": 164,
       "n_kitti": 133,
       "reliable": true
@@ -386,9 +386,9 @@
       "model": "frcnn",
       "cls": "truck",
       "size": "large",
-      "ap_coco": 0.446,
-      "ap_kitti": 0.2189,
-      "drop_pct": -50.91928251121076,
+      "ap_coco": 0.4459586999061676,
+      "ap_kitti": 0.21890026424688475,
+      "drop_pct": -50.91467790785499,
       "n_coco": 133,
       "n_kitti": 56,
       "reliable": true
@@ -399,15 +399,15 @@
     9
   ],
   "frcnn_kitti_truck": {
-    "small": 0.5469,
-    "medium": 0.1352,
-    "large": 0.2189,
+    "small": 0.5468918550584383,
+    "medium": 0.1351871387290192,
+    "large": 0.21890026424688475,
     "n_small": 34
   },
   "kitti_small_person_ap": {
-    "yolo11s": 0.0242,
-    "rtdetr-l": 0.0313,
-    "frcnn": 0.0389
+    "yolo11s": 0.024190516099378067,
+    "rtdetr-l": 0.031272353845630665,
+    "frcnn": 0.03886791861269695
   },
   "ap50_ap75": {
     "yolo11s_coco": [
@@ -458,15 +458,119 @@
     ]
   },
   "person_drop_size": {
-    "yolo11s_small": -93.28337496530669,
-    "yolo11s_medium": -73.17580621191856,
-    "yolo11s_large": -58.97435897435898,
-    "rtdetr-l_small": -92.22939424031777,
-    "rtdetr-l_medium": -73.17108503549181,
-    "rtdetr-l_large": -58.44281065445342,
-    "frcnn_small": -88.8538681948424,
-    "frcnn_medium": -65.88950836289914,
-    "frcnn_large": -50.09631056452808
+    "yolo11s_small": -93.28617458625004,
+    "yolo11s_medium": -73.16837162375606,
+    "yolo11s_large": -58.97173558475271,
+    "rtdetr-l_small": -92.23660488865997,
+    "rtdetr-l_medium": -73.17224196738485,
+    "rtdetr-l_large": -58.44724378787257,
+    "frcnn_small": -88.86272944071705,
+    "frcnn_medium": -65.89439148498067,
+    "frcnn_large": -50.091772748760036
+  },
+  "fail_counts": {
+    "003554": {
+      "yolo11s": {
+        "correct": 1,
+        "fp": 0,
+        "missed": 13
+      },
+      "rtdetr-l": {
+        "correct": 10,
+        "fp": 2,
+        "missed": 4
+      },
+      "frcnn": {
+        "correct": 8,
+        "fp": 14,
+        "missed": 6
+      }
+    },
+    "003219": {
+      "yolo11s": {
+        "correct": 10,
+        "fp": 3,
+        "missed": 10
+      },
+      "rtdetr-l": {
+        "correct": 12,
+        "fp": 2,
+        "missed": 8
+      },
+      "frcnn": {
+        "correct": 16,
+        "fp": 19,
+        "missed": 4
+      }
+    },
+    "000018": {
+      "yolo11s": {
+        "correct": 1,
+        "fp": 10,
+        "missed": 1
+      },
+      "rtdetr-l": {
+        "correct": 1,
+        "fp": 11,
+        "missed": 1
+      },
+      "frcnn": {
+        "correct": 2,
+        "fp": 26,
+        "missed": 0
+      }
+    },
+    "006255": {
+      "yolo11s": {
+        "correct": 1,
+        "fp": 8,
+        "missed": 1
+      },
+      "rtdetr-l": {
+        "correct": 1,
+        "fp": 10,
+        "missed": 1
+      },
+      "frcnn": {
+        "correct": 1,
+        "fp": 28,
+        "missed": 1
+      }
+    },
+    "005226": {
+      "yolo11s": {
+        "correct": 5,
+        "fp": 3,
+        "missed": 11
+      },
+      "rtdetr-l": {
+        "correct": 6,
+        "fp": 7,
+        "missed": 10
+      },
+      "frcnn": {
+        "correct": 5,
+        "fp": 13,
+        "missed": 11
+      }
+    },
+    "005245": {
+      "yolo11s": {
+        "correct": 6,
+        "fp": 2,
+        "missed": 10
+      },
+      "rtdetr-l": {
+        "correct": 6,
+        "fp": 7,
+        "missed": 10
+      },
+      "frcnn": {
+        "correct": 7,
+        "fp": 15,
+        "missed": 9
+      }
+    }
   },
   "ap80": {
     "yolo11s": {
@@ -488,14 +592,58 @@
   "resolution": {
     "w": 1242,
     "h": 375,
-    "count": 1181,
-    "scale_ultralytics": 0.5152979066022544,
-    "scale_frcnn": 1.0732689210950082,
-    "ratio": 2.0828125,
-    "frcnn_hw": [
-      402,
-      1333
-    ]
+    "count": 1181
+  },
+  "inputs": {
+    "yolo11s_640": {
+      "h": 224,
+      "w": 640,
+      "px": 143360,
+      "sx": 0.5152979066022544,
+      "sy": 0.5152979066022544
+    },
+    "yolo11s_1280": {
+      "h": 416,
+      "w": 1280,
+      "px": 532480,
+      "sx": 1.0305958132045088,
+      "sy": 1.0305958132045088
+    },
+    "rtdetr-l_640": {
+      "h": 640,
+      "w": 640,
+      "px": 409600,
+      "sx": 0.5152979066022544,
+      "sy": 1.7066666666666668
+    },
+    "frcnn": {
+      "h": 416,
+      "w": 1344,
+      "px": 559104,
+      "sx": 1.0732689210950082,
+      "sy": 1.072,
+      "resized_h": 402,
+      "resized_w": 1333
+    },
+    "orig": {
+      "w": 1242,
+      "h": 375,
+      "image": "000001.png"
+    },
+    "rtdetr_scale_fill": true,
+    "yolo_scale_fill": false
+  },
+  "input_px": {
+    "yolo11s_640": 143360,
+    "yolo11s_1280": 532480,
+    "rtdetr-l_640": 409600,
+    "frcnn": 559104,
+    "yolo1280_over_rtdetr": 1.3,
+    "yolo640_over_rtdetr": 0.35,
+    "yolo1280_over_frcnn": 0.9523809523809523,
+    "diff_1280_vs_rtdetr": 122880,
+    "diff_640_vs_rtdetr": 266240,
+    "1280_closer_to_rtdetr_than_640": true
   },
   "res1280": {
     "ap_640": 0.2411,
@@ -515,7 +663,17 @@
     "fps": 58.6,
     "mem": 0.129,
     "gap_to_rtdetr": 0.022899999999999976,
-    "gap_to_frcnn": 0.0041999999999999815
+    "gap_to_frcnn": 0.0041999999999999815,
+    "per_class_delta": {
+      "person": 0.0015000000000000013,
+      "car": 0.020699999999999996,
+      "truck": 0.04080000000000002
+    },
+    "per_class_640": {
+      "person": 0.1955,
+      "car": 0.4375,
+      "truck": 0.0904
+    }
   },
   "lat": {
     "yolo11s_coco": {

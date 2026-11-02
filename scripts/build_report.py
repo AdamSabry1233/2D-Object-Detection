@@ -83,11 +83,12 @@ for n in sorted(refs):
 t1 = table(
     ["Model", "Family / design", "Checkpoint", "Params (M)", "NMS", "Input handling"],
     [["YOLO11s", "single-stage CNN, anchor-free", "yolo11s.pt (Ultralytics)", PARAMS["yolo11s"]["params_M"],
-      f"yes (IoU {R[('yolo11s','coco')]['config']['nms_iou']})", "imgsz 640, letterboxed"],
+      f"yes (IoU {R[('yolo11s','coco')]['config']['nms_iou']})",
+      f"imgsz 640, aspect-preserving letterbox (KITTI: {D['inputs']['yolo11s_640']['h']}&times;{D['inputs']['yolo11s_640']['w']})"],
      ["RT-DETR-L", "transformer: hybrid encoder + query decoder", "rtdetr-l.pt (Ultralytics)", PARAMS["rtdetr-l"]["params_M"],
-      "none", "imgsz 640, letterboxed"],
+      "none", f"imgsz 640, stretched to {D['inputs']['rtdetr-l_640']['h']}&times;{D['inputs']['rtdetr-l_640']['w']}, no padding"],
      ["Faster R-CNN R50-FPN", "two-stage, anchor-based (RPN + RoI head)", "torchvision COCO_V1", PARAMS["frcnn"]["params_M"],
-      f"yes (IoU {R[('frcnn','coco')]['config']['nms_iou']})", "internal resize, min side 800 / max side 1333"]],
+      f"yes (IoU {R[('frcnn','coco')]['config']['nms_iou']})", f"internal resize, min side 800 / max side 1333 (KITTI: {D['inputs']['frcnn']['resized_h']}&times;{D['inputs']['frcnn']['resized_w']}; tensor {D['inputs']['frcnn']['h']}&times;{D['inputs']['frcnn']['w']})"]],
     "t")
 
 # Table 2: datasets
@@ -173,6 +174,21 @@ pdrop = D["person_drop_size"]
 ratio = D["ap75_over_ap50"]
 frcnn_large_car = next(x for x in D["cells"] if x["model"] == "frcnn" and x["cls"] == "car" and x["size"] == "large")
 rank_txt = {ds: " &gt; ".join(L[m] for m in rk[ds]) for ds in ("coco", "kitti")}
+I = D["inputs"]
+IP = D["input_px"]
+pc1280 = res["per_class_delta"]
+pc640 = res["per_class_640"]
+FC = D["fail_counts"]
+
+
+def fc(img, m, k): return FC[img][m][k]
+
+
+def trio(img, k): return "/".join(str(fc(img, m, k)) for m in M)
+
+
+cmds = "\n".join(["python scripts/convert_kitti_to_coco.py"] +
+                  [R[(m, ds)]["command"] for m in M for ds in ("coco", "kitti")] + [R1280["command"]])
 pd_min = min(pdrop.values()); pd_max = max(pdrop.values())
 sp_person_range = (min(D["kitti_small_person_ap"].values()), max(D["kitti_small_person_ap"].values()))
 
@@ -192,31 +208,32 @@ assert res["gap_to_frcnn"] < 0.01 < res["gap_to_rtdetr"], "1280 text"
 assert D["car_small_share"]["coco"] > 50 > D["car_small_share"]["kitti"], "composition text"
 assert sd["kitti"]["small"] < sd["coco"]["small"], "KITTI does not have more small objects"
 assert max(abs(D["ap80"][m]["diff"]) for m in M) < 0.02, "sanity text"
+assert D["inputs"]["rtdetr_scale_fill"] is True and D["inputs"]["yolo_scale_fill"] is False, "RT-DETR stretched, YOLO letterboxed"
+assert D["input_px"]["1280_closer_to_rtdetr_than_640"] and res["gap_to_rtdetr"] > 0.01, "1280 vs RT-DETR text"
+_pc = res["per_class_delta"]
+assert abs(_pc["person"]) < 0.01 and _pc["car"] > 0 and _pc["truck"] > 0, "1280 per-class text"
+assert res["latency_ms"] < R[("yolo11s", "kitti")]["latency_ms"]["mean"], "1280 latency lower than 640"
 assert D["miss"]["yolo11s"]["small"] > D["miss"]["frcnn"]["small"], "miss-rate text"
 
 # ---------- failure figures ----------
 FAIL = [
-    ("missed_by_all_1_005226", "005226",
-     "<i>Missed by all.</i> Large vehicle at the left edge is labelled car but predicted as truck by all three models (red boxes; their labels are partly cropped in this compact view, see the full-size original in <code>figures/report/</code>); a crowd of small, overlapping pedestrians is mostly missed, while the two close pedestrians on the right are found by all."),
-    ("missed_by_all_4_005245", "005245",
-     "<i>Missed by all.</i> Parked cars with heavy overlap, one car truncated by the image border, and distant cars are missed by all three models; Faster R-CNN adds many small red boxes on the far right."),
-    ("disagreement_1_003554", "003554",
-     "<i>Disagreement.</i> A row of distant cars: YOLO11s finds 1 and misses 13, RT-DETR-L finds 10, Faster R-CNN finds 8 but adds 14 false positives."),
-    ("disagreement_2_003219", "003219",
-     "<i>Disagreement.</i> Dense parked cars: Faster R-CNN finds the most (16 correct, 4 missed) and has the most false positives (19); most of its red boxes sit on small distant cars."),
-    ("false_positives_2_000018", "000018",
-     "<i>False positives.</i> Almost empty road with 2 labelled cars; the many red car boxes sit on what look like distant parked cars that KITTI did not label."),
-    ("false_positives_3_006255", "006255",
-     "<i>False positives.</i> Same kind of scene; besides red car boxes on distant parked cars, YOLO11s and Faster R-CNN place red person boxes on thin upright roadside objects, which may be a real model error (I cannot tell what they are)."),
+    ("disagreement_1_003554", "003554", "disagreement",
+     lambda i: f"Row of distant cars: YOLO11s {fc(i,'yolo11s','correct')} correct and {fc(i,'yolo11s','missed')} missed, RT-DETR-L {fc(i,'rtdetr-l','correct')} correct, Faster R-CNN {fc(i,'frcnn','correct')} correct with {fc(i,'frcnn','fp')} false positives."),
+    ("missed_by_all_1_005226", "005226", "missed by all",
+     lambda i: f"A large vehicle labelled car is predicted as truck by all three models; misses are {trio(i, 'missed')} (YOLO11s/RT-DETR-L/Faster R-CNN)."),
+    ("missed_by_all_4_005245", "005245", "missed by all",
+     lambda i: f"Overlapping parked cars, a car truncated at the image border and distant cars are missed; misses are {trio(i, 'missed')}."),
+    ("disagreement_2_003219", "003219", "disagreement",
+     lambda i: f"Dense parked cars: Faster R-CNN {fc(i,'frcnn','correct')} correct, {fc(i,'frcnn','missed')} missed, {fc(i,'frcnn','fp')} false positives; YOLO11s {fc(i,'yolo11s','correct')} correct, {fc(i,'yolo11s','missed')} missed."),
+    ("false_positives_2_000018", "000018", "false positives",
+     lambda i: f"Almost empty road with {fc(i,'frcnn','correct')+fc(i,'frcnn','missed')} labelled objects; false positives are {trio(i, 'fp')}."),
+    ("false_positives_3_006255", "006255", "false positives",
+     lambda i: f"Same kind of scene; false positives are {trio(i, 'fp')}, and YOLO11s and Faster R-CNN draw red person boxes on thin upright roadside objects."),
 ]
+F = {iid: 4 + i for i, (_n, iid, _c, _s) in enumerate(FAIL)}
 fail_html = []
-for i, (name, iid, text) in enumerate(FAIL):
-    num = 4 + i
-    idx = next(r for r in (ROOT / "figures" / "failures" / "index.csv").read_text().splitlines() if iid in r).split(",")
-    cap = (f"KITTI {iid}. {text} Matching at score &ge; 0.4 and IoU &ge; 0.5. Blue = correct, red = false positive "
-           f"(class and score), orange = missed ground truth, dashed gray = ignore region. Panels are cropped vertically to the band "
-           f"containing the boxes, and class/score labels are drawn only on large boxes; image chosen as an extreme case of its category, not a typical one, and some red boxes may be real but unlabelled objects.")
-    fail_html.append(fig(f"../figures/report/compact/{name}.png", cap, num, "fail"))
+for i, (name, iid, cat, sent) in enumerate(FAIL):
+    fail_html.append(fig(f"../figures/report/compact/{name}.png", f"KITTI {iid} ({cat}). {sent(iid)}", 4 + i, "fail"))
 
 # ---------- body ----------
 body = f"""
@@ -237,7 +254,9 @@ body = f"""
 
 <h2>3. Experimental setup, hardware and reproducibility</h2>
 <p><b>Hardware and software.</b> {esc(gpu)} ({vram_gb:.0f} GB VRAM, {cap_w} W power cap, driver {driver}), {ram_gb} GB RAM, Windows 11 (Git Bash). Python {r0['python']}, torch {ver['torch']}, torchvision {ver['torchvision']}, ultralytics {ver['ultralytics']}, pycocotools {ver['pycocotools']}, numpy {ver['numpy']}. These come from the <code>hardware</code> and <code>versions</code> fields stored in every result file.</p>
-<p><b>Protocol.</b> YOLO11s and RT-DETR-L run through the Ultralytics package [12], Faster R-CNN through torchvision [13], and all predictions are scored with pycocotools [14]. Confidence threshold {r0['config']['conf_thresh']} and at most {r0['config']['max_det']} detections per image for all models, so that AP is computed over the full precision-recall curve. NMS IoU is {R[('yolo11s','coco')]['config']['nms_iou']} for YOLO11s, {R[('frcnn','coco')]['config']['nms_iou']} for Faster R-CNN, and none for RT-DETR-L. YOLO11s and RT-DETR-L run at imgsz 640 (letterboxed); Faster R-CNN uses torchvision's internal resize (min side 800, max side 1333), so the models see KITTI at different scales (Section 5.5). Ultralytics class ids 0&ndash;79 are mapped to COCO ids with <code>COCO80_TO_91</code>. <b>Latency</b> is the mean time per image of preprocessing + model + NMS + copy to CPU, measured after 10 warmup images with CUDA synchronization; image decoding is not timed. <b>Peak memory</b> is <code>torch.cuda.max_memory_allocated</code> (tensor allocations only, excluding the CUDA context). Because the GPU is a power-limited laptop part, I treat latency differences under about 20% as noise.</p>
+<p><b>Protocol.</b> YOLO11s and RT-DETR-L run through the Ultralytics package [12], Faster R-CNN through torchvision [13], and all predictions are scored with pycocotools [14]. Confidence threshold {r0['config']['conf_thresh']} and at most {r0['config']['max_det']} detections per image for all models, so that AP is computed over the full precision-recall curve. NMS IoU is {R[('yolo11s','coco')]['config']['nms_iou']} for YOLO11s, {R[('frcnn','coco')]['config']['nms_iou']} for Faster R-CNN, and none for RT-DETR-L. <b>Input handling differs by model.</b> YOLO11s (imgsz 640) is letterboxed with minimal padding, so a KITTI image enters as {I['yolo11s_640']['h']}&times;{I['yolo11s_640']['w']}. RT-DETR-L (also imgsz 640) is <i>not</i> letterboxed: the installed Ultralytics {ver['ultralytics']} sets <code>scale_fill = True</code> in its RT-DETR predictor, so every image is stretched to {I['rtdetr-l_640']['h']}&times;{I['rtdetr-l_640']['w']} without padding; I confirmed both shapes by running each model's own preprocessing on a KITTI image. Faster R-CNN uses torchvision's internal resize (min side 800, max side 1333): {I['frcnn']['resized_h']}&times;{I['frcnn']['resized_w']} for KITTI, in a tensor padded to {I['frcnn']['h']}&times;{I['frcnn']['w']}. The three models therefore see KITTI at three different effective inputs (Section 5.5). Ultralytics class ids 0&ndash;79 are mapped to COCO ids with <code>COCO80_TO_91</code>. <b>Latency</b> is the mean time per image of preprocessing + model + NMS + copy to CPU, measured after 10 warmup images with CUDA synchronization; image decoding is not timed. <b>Peak memory</b> is <code>torch.cuda.max_memory_allocated</code> (tensor allocations only, excluding the CUDA context). Because the GPU is a power-limited laptop part, I treat latency differences under about 20% as noise.</p>
+<p><b>Commands</b> (the <code>command</code> field of each result file; the conversion command is from <code>COMMANDS.md</code>):</p>
+<pre class="cmd">{html.escape(cmds)}</pre>
 <p><b>Reproduction and evidence.</b> Each <code>results/&lt;model&gt;_&lt;dataset&gt;.json</code> stores the metrics, latency, memory, configuration, versions, hardware and the exact command that produced it; <code>COMMANDS.md</code> lists all commands in order, and the code is in <code>scripts/</code> of the repository above. Raw detections (large) and datasets are kept outside the repository. A 50-image smoke test is excluded from all results. No training was done, so the KITTI val split carries no leakage concern.</p>
 
 <h2>4. Quantitative results</h2>
@@ -256,10 +275,10 @@ body = f"""
 <p><b>5.2 By class.</b> Figure 2 shows that the drop is concentrated in two classes. Person AP changes by {p1(dc['yolo11s_person'])}, {p1(dc['rtdetr-l_person'])} and {p1(dc['frcnn_person'])} and truck AP by {p1(dc['yolo11s_truck'])}, {p1(dc['rtdetr-l_truck'])} and {p1(dc['frcnn_truck'])} (YOLO11s, RT-DETR-L, Faster R-CNN), while car AP changes by only {p1(dc['yolo11s_car'])}, {p1(dc['rtdetr-l_car'])} and {p1(dc['frcnn_car'])}. The truck numbers rest on {nk['truck']} objects and are noisy; I did not test whether label-definition differences (for example vans merged into car) contribute.</p>
 {fig("../figures/fig2_per_class_ap.png", f"Per-class AP@[.50:.95] (3-class) on COCO and KITTI. Person and truck degrade; car is flat overall (but see Table 7: at matched sizes car AP is lower on KITTI). Truck n={nk['truck']} on KITTI, so its AP is noisy; KITTI person n={nk['person']}. Same detection thresholds as Figure 1.", 2)}
 <p><b>5.3 By size and class &times; size.</b> Table 7 separates class from size. At matched sizes car AP is <i>lower</i> on KITTI in {cd[0]} of {cd[1]} reliable cells, even though pooled car AP looks flat; the closest to flat is Faster R-CNN on large cars ({f3(frcnn_large_car['ap_coco'])} vs {f3(frcnn_large_car['ap_kitti'])}, {p1(frcnn_large_car['drop_pct'])}). Person AP drops at every size, by {abs(pd_max):.0f}% to {abs(pd_min):.0f}% across models and sizes, and small KITTI persons score only {sp_person_range[0]:.3f}&ndash;{sp_person_range[1]:.3f} AP for all three models, so pedestrians fail at every size (a class-level problem, not only a size problem; measured).</p>
-{tcap(7, "AP by class and object size, COCO &rarr; KITTI, with object counts. Size buckets are COCO's (small &lt; 32&sup2; px, medium &lt; 96&sup2; px) but COCO area comes from segmentation masks and the converted KITTI file uses box area. &dagger; fewer than 50 objects in one dataset: unreliable.")}
+{tcap(7, "AP by class and object size, COCO &rarr; KITTI, with object counts. Size buckets are COCO's (small &lt; 32&sup2; px, medium &lt; 96&sup2; px) but COCO area comes from segmentation masks and the converted KITTI file uses box area. AP is computed from unrounded values. &dagger; fewer than 50 objects in one dataset: unreliable.")}
 {t7}
 <p><b>5.4 Composition effect.</b> The flat pooled car AP is consistent with a composition effect (hypothesis, not isolated by an experiment): {cs_share['coco']:.0f}% of COCO cars are small versus {cs_share['kitti']:.0f}% of KITTI cars, and small objects have much lower AP. KITTI does <i>not</i> have more small objects than COCO in this 3-class view: person/car/truck are {sd['coco']['small']:.0f}/{sd['coco']['medium']:.0f}/{sd['coco']['large']:.0f}% small/medium/large on COCO and {sd['kitti']['small']:.0f}/{sd['kitti']['medium']:.0f}/{sd['kitti']['large']:.0f}% on KITTI (measured). Pooled size AP therefore needs care: Faster R-CNN's pooled small-object AP is almost unchanged ({f3(st('frcnn','coco','AP_small'))} &rarr; {f3(st('frcnn','kitti','AP_small'))}, {p1(ds_['frcnn_small'])}), but this is driven by {fk['n_small']} small KITTI trucks (small-truck AP {f3(fk['small'])} versus medium {f3(fk['medium'])}), which is noise. I therefore do <b>not</b> claim that Faster R-CNN is robust on small objects.</p>
-<p><b>5.5 Resolution confound and the 1280 experiment.</b> For the most common KITTI image size ({rs['w']}&times;{rs['h']}), the 640 letterbox scales the image by {rs['scale_ultralytics']:.2f}, while Faster R-CNN's resize scales it by {rs['scale_frcnn']:.2f} (to about {rs['frcnn_hw'][1]}&times;{rs['frcnn_hw'][0]}), about {rs['ratio']:.1f}&times; the linear scale (derived). This confounds any architecture-versus-architecture claim on KITTI. To test it for one model, I re-ran YOLO11s on KITTI at imgsz 1280: 3-class AP rose from {f3(res['ap_640'])} to {f3(res['ap_1280'])} ({res['delta']:+.3f}, {p1(res['delta_pct'])}) and small-object AP from {f3(res['ap_small_640'])} to {f3(res['ap_small'])}. YOLO11s then trails RT-DETR-L by {res['gap_to_rtdetr']:.3f} AP and Faster R-CNN by only {res['gap_to_frcnn']:.3f}, within what I consider noise. So resolution explains part of YOLO11s' KITTI deficit relative to Faster R-CNN, but it does not close the gap to RT-DETR-L. I did not vary resolution for the other two models, and the 1280 latency ({res['latency_ms']} ms) is not comparable to the 640 runs; I do not interpret it.</p>
+<p><b>5.5 Input-size confound and the 1280 experiment.</b> The three models do not see KITTI at the same effective input (measured on one {I['orig']['w']}&times;{I['orig']['h']} image, <code>results/input_shapes.json</code>). YOLO11s is letterboxed with an aspect-preserving rectangle: {I['yolo11s_640']['h']}&times;{I['yolo11s_640']['w']}, a scale of {I['yolo11s_640']['sx']:.2f} on both axes (padding included in the size). RT-DETR-L is stretched to {I['rtdetr-l_640']['h']}&times;{I['rtdetr-l_640']['w']} with no padding, so aspect ratio is not preserved: its scale is {I['rtdetr-l_640']['sx']:.2f} horizontally but {I['rtdetr-l_640']['sy']:.2f} vertically. Faster R-CNN is resized to {I['frcnn']['resized_h']}&times;{I['frcnn']['resized_w']}, a scale of {I['frcnn']['sx']:.2f} on both axes. Network input sizes are {IP['yolo11s_640']:,}, {IP['rtdetr-l_640']:,} and {IP['frcnn']:,} pixels for YOLO11s, RT-DETR-L and Faster R-CNN (derived). RT-DETR-L-versus-YOLO11s comparisons are therefore confounded by input size as well as architecture, not only the comparisons with Faster R-CNN. To test input size for one model, I re-ran YOLO11s on KITTI at imgsz 1280 ({I['yolo11s_1280']['h']}&times;{I['yolo11s_1280']['w']}, {IP['yolo11s_1280']:,} pixels): 3-class AP rose from {f3(res['ap_640'])} to {f3(res['ap_1280'])} ({res['delta']:+.3f}, {p1(res['delta_pct'])}) and small-object AP from {f3(res['ap_small_640'])} to {f3(res['ap_small'])}. Its pixel count is now {IP['yolo1280_over_rtdetr']:.2f}&times; RT-DETR-L's, closer to it than the 640 run's was ({IP['diff_1280_vs_rtdetr']:,} versus {IP['diff_640_vs_rtdetr']:,} pixels apart), yet YOLO11s still trails RT-DETR-L by {res['gap_to_rtdetr']:.3f} AP; it trails Faster R-CNN by only {res['gap_to_frcnn']:.3f}, within what I consider noise. A hypothesis, not tested here, is that input pixel count alone does not explain RT-DETR-L's advantage over YOLO11s; the other two models were not re-run at other sizes. By class (measured, single run), person AP was unchanged at 1280 ({f3(pc640['person'])} vs {f3(res['per_class']['person'])}) while car ({pc1280['car']:+.3f}) and truck ({pc1280['truck']:+.3f}) improved, so resolution does not explain the pedestrian collapse. The 1280 run's mean latency ({res['latency_ms']} ms) came out lower than the 640 run's ({R[('yolo11s','kitti')]['latency_ms']['mean']} ms), which cannot reflect its real cost, so I treat it as evidence of timing noise on this laptop and do not use it.</p>
 
 <h2>6. Analysis 2: speed-accuracy trade-off and architecture</h2>
 <p>Figure 3 plots AP against latency. <i>Measured:</i> YOLO11s is the fastest and smallest ({lat['yolo11s_coco']['fps']} FPS on COCO, {lat['yolo11s_kitti']['fps']} on KITTI, {lat['yolo11s_coco']['mem']} GB peak). On COCO, RT-DETR-L has {sp['coco']['rtdetr_over_yolo_latency']:.1f}&times; YOLO11s' latency for {sp['coco']['ap_gain_rtdetr_over_yolo']:+.3f} AP ({p1(sp['coco']['ap_gain_rtdetr_over_yolo_pct'])}); on KITTI the AP gain is {sp['kitti']['ap_gain_rtdetr_over_yolo']:+.3f} ({p1(sp['kitti']['ap_gain_rtdetr_over_yolo_pct'])}) at {sp['kitti']['rtdetr_over_yolo_latency']:.1f}&times; the latency. Faster R-CNN is the slowest ({lat['frcnn_coco']['fps']} FPS on COCO, {lat['frcnn_kitti']['fps']} on KITTI) and uses the most memory. RT-DETR-L is faster ({sp['coco']['frcnn_over_rtdetr_latency']:.1f}&times; on COCO, {sp['kitti']['frcnn_over_rtdetr_latency']:.1f}&times; on KITTI) and at least as accurate as Faster R-CNN on both datasets ({sp['coco']['ap_rtdetr_minus_frcnn']:+.3f} and {sp['kitti']['ap_rtdetr_minus_frcnn']:+.3f} AP), although the KITTI AP gap is small (Section 5.1), so RT-DETR-L is the most balanced choice here and YOLO11s the choice if speed or memory dominate.</p>
@@ -268,19 +287,19 @@ body = f"""
 <p><b>Architecture discussion (hedged).</b> YOLO11s is a single-stage, anchor-free CNN with NMS on the output; RT-DETR-L is query-based with a transformer decoder and needs no NMS [7][8]; Faster R-CNN is two-stage and anchor-based with an RPN and NMS [4][5][6]. The measurements are consistent with the usual expectation that the one-stage model is cheapest and the two-stage model costs the most per image. They do not isolate the cause of RT-DETR-L's better accuracy on both datasets: its checkpoint, parameter count ({PARAMS['rtdetr-l']['params_M']} M vs {PARAMS['yolo11s']['params_M']} M for YOLO11s) and training recipe all differ from YOLO11s, so I cannot attribute the gap to the NMS-free design (hypothesis). Likewise the comparison with Faster R-CNN is confounded by input scale (Section 5.5).</p>
 
 <h2>7. Failure analysis</h2>
-<p>I matched detections to ground truth at score &ge; 0.4 and IoU &ge; 0.5 (<code>scripts/failure_analysis.py</code>) and ranked KITTI images by misses common to all models (&ldquo;missed by all&rdquo;), by the spread in misses between models (&ldquo;disagreement&rdquo;), and by total false positives. I picked two of the four top images per category that make different points; the reasons are in <code>figures/report/SELECTION.md</code>. These are extreme cases by construction. Table 8 gives the corresponding overall miss rates: YOLO11s misses {D['miss']['yolo11s']['small']:.0%} of small objects versus {D['miss']['frcnn']['small']:.0%} for Faster R-CNN, and trucks are missed most often by every model.</p>
+<p>I matched detections to ground truth at score &ge; 0.4 and IoU &ge; 0.5 (<code>scripts/failure_analysis.py</code>) and ranked KITTI images by misses common to all models (&ldquo;missed by all&rdquo;), by the spread in misses between models (&ldquo;disagreement&rdquo;), and by total false positives. A single score cutoff is not the same operating point for every model, because the models' scores are calibrated differently, so the miss and false-positive counts below depend on it. I picked two of the four top images per category that make different points (reasons in <code>figures/report/SELECTION.md</code>); they are extreme cases by construction. In Figures 4&ndash;9, panels are YOLO11s, RT-DETR-L and Faster R-CNN from top to bottom; blue = correct, red = false positive, orange = missed ground truth, dashed gray = ignore region; class and score labels appear only on large boxes; panels are cropped vertically to the band containing the boxes; and some red boxes may be real but unlabelled objects. Table 8 gives the overall miss rates: YOLO11s misses {D['miss']['yolo11s']['small']:.0%} of small objects versus {D['miss']['frcnn']['small']:.0%} for Faster R-CNN, and trucks are missed most often by every model.</p>
 {tcap(8, "KITTI miss rate (fraction of ground-truth objects with no matching detection) at score &ge; 0.4, IoU &ge; 0.5, by object size and class.")}
 {t8}
-<p>Figure 4 shows a vehicle labelled <i>car</i> that all models call <i>truck</i> and a crowd of small pedestrians that is mostly missed, consistent with a class-definition mismatch and small, overlapping people (the vehicle's original KITTI class is not visible in the image). Figure 5 shows overlap and truncation among parked cars. Figures 6 and 7 show where the models disagree: YOLO11s misses most distant cars that RT-DETR-L finds (Figure 6), and Faster R-CNN finds the most cars but adds many extra boxes (Figure 7), consistent with the higher input scale and miss-rate pattern in Table 8 (hypothesis). Figures 8 and 9 show false positives: many red car boxes sit on distant parked cars that appear real but unlabelled (the Ultralytics KITTI export has no DontCare regions), so KITTI AP may understate precision (hypothesis, from visual inspection only). The red person boxes in Figure 9 may be genuine errors; I cannot tell what the objects are at this size.</p>
+<p>Figure {F['003554']} shows a row of distant cars that YOLO11s mostly misses and RT-DETR-L finds. Figure {F['005226']} shows a vehicle labelled <i>car</i> that all models call <i>truck</i> and a crowd of small pedestrians that is mostly missed (consistent with a class-definition mismatch and small, overlapping people; the vehicle's original KITTI class is not visible). Figure {F['005245']} shows overlap and truncation among parked cars. In Figure {F['003219']}, Faster R-CNN finds the most cars but adds many extra boxes; together with Figure {F['003554']}, this is consistent with its larger input and the miss-rate pattern in Table 8 (hypothesis). In Figures {F['000018']} and {F['006255']}, many red car boxes sit on distant parked cars that appear real but unlabelled (the Ultralytics KITTI export has no DontCare regions), so KITTI AP may understate precision (hypothesis, from visual inspection only); the red person boxes in Figure {F['006255']} may be genuine errors, but I cannot tell what those objects are.</p>
 {"".join(fail_html)}
 
 <h2>8. Limitations and threats to validity</h2>
 <ul>
 <li><b>Labels.</b> The Ultralytics KITTI export drops DontCare regions and has no truncation or occlusion flags, so some false positives may be real unlabelled objects. Van is merged into car; cyclist and sitting person are ignore regions; tram and misc are dropped. Only {nk['truck']} trucks exist in KITTI val.</li>
-<li><b>Resolution.</b> Models are evaluated at their default scales; Faster R-CNN sees KITTI at about {rs['ratio']:.1f}&times; the linear scale of the other two. Only YOLO11s was re-run at a higher resolution.</li>
+<li><b>Input size.</b> The three models see KITTI at three different effective inputs (Section 5.5), so every pairwise comparison is confounded by input size; only YOLO11s was re-run at a higher resolution. The <code>input_size</code> field in the RT-DETR-L result files says &ldquo;letterboxed&rdquo;, which is inaccurate; the measured preprocessing is in <code>results/input_shapes.json</code>.</li>
 <li><b>Statistics.</b> One run per configuration, no confidence intervals or bootstrap, so small AP differences between models are not established.</li>
 <li><b>Size buckets.</b> COCO area is mask area, KITTI area is box area, so the buckets are not identical across datasets.</li>
-<li><b>Latency.</b> Measured on a power-limited laptop GPU, excluding image decoding; differences under about 20% are noise. The 1280 latency is not comparable to the 640 runs.</li>
+<li><b>Latency.</b> Measured on a power-limited laptop GPU, excluding image decoding; differences under about 20% are noise. The 1280 run's latency is not used.</li>
 <li><b>Failure figures.</b> Selected extreme cases, judged visually; causes are hypotheses.</li>
 <li><b>AR@1</b> differs between the 80-class and 3-class tables because maxDets is capped per image per class; AR@100 is the meaningful comparison.</li>
 </ul>
@@ -289,14 +308,14 @@ body = f"""
 <ul>
 <li>All three COCO-pretrained detectors lose a large share of their 3-class AP on KITTI ({abs(do['yolo11s']):.0f}%, {abs(do['rtdetr-l']):.0f}%, {abs(do['frcnn']):.0f}% for YOLO11s, RT-DETR-L, Faster R-CNN), and the ranking changes (Section 5.1).</li>
 <li>The loss is concentrated in person and truck; the flat pooled car AP hides lower AP at matched sizes and is consistent with a composition effect (Sections 5.2&ndash;5.4).</li>
-<li>Faster R-CNN's smaller relative drop and its pooled small-object AP should not be read as robustness: it is partly an input-scale confound and small-truck noise. Raising YOLO11s to 1280 recovers part of its deficit ({p1(res['delta_pct'])}).</li>
+<li>Faster R-CNN's smaller relative drop and its pooled small-object AP should not be read as robustness: it is partly an input-size confound and small-truck noise. Raising YOLO11s to 1280 recovers part of its deficit ({p1(res['delta_pct'])}) but leaves person AP unchanged, so resolution alone does not explain the pedestrian collapse (single run).</li>
 <li>RT-DETR-L gives the best accuracy-speed balance here; YOLO11s is the cheapest. The KITTI gap between RT-DETR-L and Faster R-CNN is within what I cannot resolve without confidence intervals.</li>
 <li>Many KITTI &ldquo;false positives&rdquo; appear to be real unlabelled objects, so KITTI AP is a conservative estimate (hypothesis). Fine-tuning on KITTI and per-class statistics with confidence intervals are the obvious next steps.</li>
 </ul>
 
 <h2>10. References</h2>
 <ol class="refs">{"".join(ref_html)}</ol>
-<p class="ai">AI assistants (Claude) were used to help write code and draft this report; I ran all experiments and reviewed all results.</p>
+<p class="ai">AI assistants (Claude) helped write the code and draft this report, and ran some analysis scripts on my machine at my direction; I ran the main evaluations and reviewed the results.</p>
 """
 
 CSS = """
@@ -316,12 +335,14 @@ td:not(:first-child) { }
 .tcap { font-size: 8.8pt; margin: 5pt 0 1pt 0; break-after: avoid; }
 figure { margin: 4pt 0 6pt 0; break-inside: avoid; }
 figure img { width: 100%; display: block; }
-figure.narrow img { width: 82%; margin: 0 auto; }
+figure.narrow img { width: 70%; margin: 0 auto; }
+figure.fail img { width: 88%; margin: 0 auto; }
 figcaption { font-size: 8.6pt; margin-top: 2pt; text-align: justify; }
 ul { margin: 2pt 0 4pt 0; padding-left: 15pt; } li { margin-bottom: 2pt; text-align: justify; }
-ol.refs { font-size: 8.4pt; padding-left: 17pt; margin: 2pt 0; } ol.refs li { margin-bottom: 1.5pt; text-align: left; }
+ol.refs { font-size: 8pt; padding-left: 17pt; margin: 2pt 0; } ol.refs li { margin-bottom: 1.5pt; text-align: left; }
 .url { font-family: Consolas, monospace; font-size: 7.8pt; overflow-wrap: anywhere; color: #1a3d7c; }
 .ai { font-size: 9pt; margin-top: 5pt; }
+pre.cmd { font-family: Consolas, monospace; font-size: 7.4pt; line-height: 1.25; background: #f3f3f3; border: 1px solid #bbb; padding: 3pt 5pt; margin: 2pt 0 5pt 0; white-space: pre-wrap; break-inside: avoid; }
 """
 
 page = f'<!doctype html><html><head><meta charset="utf-8"><title>2D Object Detection, Track A</title><style>{CSS}</style></head><body>{body}</body></html>'

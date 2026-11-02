@@ -1,0 +1,26 @@
+{
+  "image": "000001.png",
+  "orig_w": 1242,
+  "orig_h": 375,
+  "yolo11s_640": {
+    "input_h": 224,
+    "input_w": 640,
+    "scale_fill": false
+  },
+  "yolo11s_1280": {
+    "input_h": 416,
+    "input_w": 1280,
+    "scale_fill": false
+  },
+  "rtdetr-l_640": {
+    "input_h": 640,
+    "input_w": 640,
+    "scale_fill": true
+  },
+  "frcnn": {
+    "resized_h": 402,
+    "resized_w": 1333,
+    "padded_h": 416,
+    "padded_w": 1344
+  }
+}

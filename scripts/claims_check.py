@@ -31,7 +31,7 @@ def load():
     R1280 = json.loads((RES / "yolo11s_kitti_imgsz1280.json").read_text())
     params = json.loads((RES / "params" / "model_params.json").read_text())
     published = json.loads((ROOT / "docs" / "published_map.json").read_text())
-    with open(RES / "class_size_ap.csv") as f:
+    with open(RES / "class_size_ap_full.csv") as f:
         cs = {(r["dataset"], r["model"], r["cls"]): r for r in csv.DictReader(f)}
     with open(ROOT / "figures" / "failures" / "miss_rates.csv") as f:
         miss = {r["model"]: r for r in csv.DictReader(f)}
@@ -175,6 +175,10 @@ def compute():
             D["person_drop_size"][f"{m}_{s}"] = x["drop_pct"]
             add(f"person_drop_{m}_{s}", f"{LABEL[m]} {s}-person AP, COCO -> KITTI (n_coco={x['n_coco']}, n_kitti={x['n_kitti']})",
                 "results/class_size_ap.csv", f"{x['ap_coco']:.3f} -> {x['ap_kitti']:.3f} ({x['drop_pct']:+.1f}%)", "DERIVED")
+    fc = json.loads((ROOT / "figures" / "report" / "counts.json").read_text())
+    D["fail_counts"] = fc
+    add("failure_counts", "Correct / false-positive / missed counts per model for the six selected failure images (score>=0.4, IoU>=0.5)",
+        "figures/report/counts.json (scripts/make_report_failures.py)", f"{len(fc)} images x 3 models", "MEASURED")
     add("table_headline", "AP, AP50, AP75, AP small/medium/large, AR100 and per-class AP for every model and dataset (results tables)",
         "results/<model>_<dataset>.json (also results/summary.csv)", "read directly", "MEASURED")
     add("table_class_size", "Per class x size AP and object counts for every model and dataset (class x size table)",
@@ -196,16 +200,48 @@ def compute():
         add(f"ap80_{m}", f"{LABEL[m]} 80-class COCO AP: measured vs published", f"results/{m}_coco.json, docs/published_map.json",
             f"{got:.3f} vs {pub:.3f} (diff {got-pub:+.3f})", "DERIVED")
 
-    # ---- resolution ----
+    # ---- input size actually seen by each model (measured by scripts/measure_input_shapes.py) ----
     sizes = Counter((i["width"], i["height"]) for i in kgt["images"])
     (w, h), cnt = sizes.most_common(1)[0]
-    s_ul = 640 / max(w, h)
-    s_fr = min(800 / min(w, h), 1333 / max(w, h))
-    D["resolution"] = dict(w=w, h=h, count=cnt, scale_ultralytics=s_ul, scale_frcnn=s_fr,
-                           ratio=s_fr / s_ul, frcnn_hw=[round(h * s_fr), round(w * s_fr)])
-    add("res_scale", f"Most common KITTI image size {w}x{h} ({cnt} of {len(kgt['images'])} images): scale to 640 letterbox / Faster R-CNN resize / ratio",
-        "annotations/kitti_val_coco.json (image sizes) + resize rules in scripts/eval_detector.py and torchvision defaults",
-        f"{s_ul:.2f} / {s_fr:.2f} / {s_fr/s_ul:.1f}x", "DERIVED")
+    D["resolution"] = dict(w=w, h=h, count=cnt)
+    sh = json.loads((RES / "input_shapes.json").read_text())
+    ow, oh = sh["orig_w"], sh["orig_h"]
+    yo, y12, rt, fr = sh["yolo11s_640"], sh["yolo11s_1280"], sh["rtdetr-l_640"], sh["frcnn"]
+    D["inputs"] = {
+        "yolo11s_640": dict(h=yo["input_h"], w=yo["input_w"], px=yo["input_h"] * yo["input_w"],
+                            sx=yo["input_w"] / ow, sy=yo["input_w"] / ow),
+        "yolo11s_1280": dict(h=y12["input_h"], w=y12["input_w"], px=y12["input_h"] * y12["input_w"],
+                             sx=y12["input_w"] / ow, sy=y12["input_w"] / ow),
+        "rtdetr-l_640": dict(h=rt["input_h"], w=rt["input_w"], px=rt["input_h"] * rt["input_w"],
+                             sx=rt["input_w"] / ow, sy=rt["input_h"] / oh),
+        "frcnn": dict(h=fr["padded_h"], w=fr["padded_w"], px=fr["padded_h"] * fr["padded_w"],
+                      sx=fr["resized_w"] / ow, sy=fr["resized_h"] / oh,
+                      resized_h=fr["resized_h"], resized_w=fr["resized_w"]),
+        "orig": dict(w=ow, h=oh, image=sh["image"]),
+        "rtdetr_scale_fill": rt["scale_fill"], "yolo_scale_fill": yo["scale_fill"],
+    }
+    I = D["inputs"]
+    px = {k: I[k]["px"] for k in ("yolo11s_640", "yolo11s_1280", "rtdetr-l_640", "frcnn")}
+    D["input_px"] = dict(px, yolo1280_over_rtdetr=px["yolo11s_1280"] / px["rtdetr-l_640"],
+                         yolo640_over_rtdetr=px["yolo11s_640"] / px["rtdetr-l_640"],
+                         yolo1280_over_frcnn=px["yolo11s_1280"] / px["frcnn"],
+                         diff_1280_vs_rtdetr=abs(px["yolo11s_1280"] - px["rtdetr-l_640"]),
+                         diff_640_vs_rtdetr=abs(px["yolo11s_640"] - px["rtdetr-l_640"]))
+    D["input_px"]["1280_closer_to_rtdetr_than_640"] = D["input_px"]["diff_1280_vs_rtdetr"] < D["input_px"]["diff_640_vs_rtdetr"]
+    add("input_shapes", f"Network input per model for one {ow}x{oh} KITTI image ({sh['image']}): YOLO11s 640 / YOLO11s 1280 / RT-DETR-L / Faster R-CNN (height x width; Faster R-CNN resized size, tensor padded)",
+        "results/input_shapes.json (scripts/measure_input_shapes.py); ultralytics/models/rtdetr/predict.py scale_fill",
+        f"{yo['input_h']}x{yo['input_w']} / {y12['input_h']}x{y12['input_w']} / {rt['input_h']}x{rt['input_w']} (stretched, scale_fill={rt['scale_fill']}) / "
+        f"{fr['resized_h']}x{fr['resized_w']} (tensor {fr['padded_h']}x{fr['padded_w']})", "MEASURED")
+    add("input_scales", "Scale factor (horizontal / vertical) from the original image: YOLO11s 640 / YOLO11s 1280 / RT-DETR-L / Faster R-CNN",
+        "results/input_shapes.json", " / ".join(f"{I[k]['sx']:.2f}/{I[k]['sy']:.2f}" for k in ("yolo11s_640", "yolo11s_1280", "rtdetr-l_640", "frcnn")), "DERIVED")
+    add("input_pixels", "Network input pixels: YOLO11s 640 / YOLO11s 1280 / RT-DETR-L / Faster R-CNN (padded tensors)",
+        "results/input_shapes.json", " / ".join(f"{px[k]:,}" for k in ("yolo11s_640", "yolo11s_1280", "rtdetr-l_640", "frcnn")), "DERIVED")
+    add("input_px_1280", "YOLO11s 1280 input pixels relative to RT-DETR-L 640 (and 640-run relative); absolute differences; 1280 closer than 640",
+        "results/input_shapes.json",
+        f"{D['input_px']['yolo1280_over_rtdetr']:.2f}x (640: {D['input_px']['yolo640_over_rtdetr']:.2f}x); "
+        f"{D['input_px']['diff_1280_vs_rtdetr']:,} vs {D['input_px']['diff_640_vs_rtdetr']:,}; {D['input_px']['1280_closer_to_rtdetr_than_640']}", "DERIVED")
+    add("input_px_1280_frcnn", "YOLO11s 1280 input pixels relative to Faster R-CNN", "results/input_shapes.json",
+        f"{D['input_px']['yolo1280_over_frcnn']:.2f}x", "DERIVED")
     a640, a1280 = ap3("yolo11s", "kitti"), R1280["metrics"][M3]["stats"]["AP"]
     D["res1280"] = dict(ap_640=a640, ap_1280=a1280, delta=a1280 - a640, delta_pct=pct(a1280, a640),
                         ap50=R1280["metrics"][M3]["stats"]["AP50"], ap75=R1280["metrics"][M3]["stats"]["AP75"],
@@ -214,6 +250,12 @@ def compute():
                         per_class=R1280["metrics"][M3]["per_class_AP"],
                         latency_ms=R1280["latency_ms"]["mean"], fps=R1280["fps"], mem=R1280["peak_gpu_mem_gb"],
                         gap_to_rtdetr=ap3("rtdetr-l", "kitti") - a1280, gap_to_frcnn=ap3("frcnn", "kitti") - a1280)
+    pc1280 = R1280["metrics"][M3]["per_class_AP"]
+    D["res1280"]["per_class_delta"] = {c: pc1280[c] - pc("yolo11s", "kitti", c) for c in CLASSES}
+    D["res1280"]["per_class_640"] = {c: pc("yolo11s", "kitti", c) for c in CLASSES}
+    add("res1280_per_class", "YOLO11s KITTI per-class AP at imgsz 640 -> 1280 (person / car / truck; single run)",
+        "results/yolo11s_kitti.json, yolo11s_kitti_imgsz1280.json",
+        "; ".join(f"{c} {pc('yolo11s','kitti',c):.3f} -> {pc1280[c]:.3f} ({pc1280[c]-pc('yolo11s','kitti',c):+.3f})" for c in CLASSES), "DERIVED")
     add("res1280", "YOLO11s KITTI 3-class AP at imgsz 640 -> 1280", "results/yolo11s_kitti.json, yolo11s_kitti_imgsz1280.json",
         f"{a640:.3f} -> {a1280:.3f} ({a1280-a640:+.3f}, {pct(a1280,a640):+.1f}%)", "DERIVED")
     add("res1280_gaps", "KITTI AP gap that remains at imgsz 1280 vs RT-DETR-L and vs Faster R-CNN",
@@ -271,7 +313,7 @@ def compute():
     # ---- hypotheses ----
     add("hyp_composition", "Car AP looks flat overall partly because the small-car share differs strongly between datasets (see car_small_share)",
         "results/class_size_ap.csv", "not isolated by an experiment", "HYPOTHESIS")
-    add("hyp_resolution", "Faster R-CNN's smaller KITTI drop is partly due to its larger input scale on KITTI (see res_scale); the 1280 run tests this only for YOLO11s",
+    add("hyp_resolution", "Faster R-CNN's smaller KITTI drop is partly due to its different effective input on KITTI (see input_shapes); the 1280 run tests this only for YOLO11s",
         "results/yolo11s_kitti_imgsz1280.json", "partially tested, not isolated", "HYPOTHESIS")
     add("hyp_unlabeled", "Many false positives in the selected failure figures are real but unlabeled objects (Ultralytics KITTI has no DontCare regions)",
         "figures/report/SELECTION.md", "visual judgement only", "HYPOTHESIS")

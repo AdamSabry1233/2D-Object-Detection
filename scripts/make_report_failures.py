@@ -26,13 +26,13 @@ LABEL = {"yolo11s": "YOLO11s", "rtdetr-l": "RT-DETR-L", "frcnn": "Faster R-CNN"}
 WIDTH_IN = 7.2
 
 
-def draw_box(ax, b, color, lw, ls, label=None, ymin=0, fs=6.5):
+def draw_box(ax, b, color, lw, ls, label=None, ymin=0, fs=6.5, off=24):
     if label and b[2] * b[3] <= 6000:
         label = None   # labels only on large boxes; small ones overlap and are unreadable
     ax.add_patch(patches.Rectangle((b[0], b[1]), b[2], b[3], fill=False,
                                    edgecolor=color, linewidth=lw, linestyle=ls))
     if label:
-        ax.text(b[0] + 1, max(b[1] - 2, ymin + 9), label, color=color, fontsize=fs, va="bottom")
+        ax.text(b[0] + 1, max(b[1] - 2, ymin + off), label, color=color, fontsize=fs, va="bottom")
 
 
 def main():
@@ -53,6 +53,7 @@ def main():
                 by[d["image_id"]].append(d)
         dets[m] = {i: match(gts[i], sorted(by[i], key=lambda d: -d["score"]), IOU) for i in ids}
 
+    counts = {}
     for p in sorted(SRC.glob("*.png")):
         fname = p.stem.split("_")[-1] + ".png"
         info = imgs[fname]
@@ -67,9 +68,12 @@ def main():
         ymax = min(H, max(b[1] + b[3] for b in small) + 15)
         ymax = max(ymax, ymin + 0.3 * H)
         ymax = min(ymax, H)
-        ratios = [(ymax - ymin) / W * WIDTH_IN + 0.18] * len(MODELS)
-        fig, axes = plt.subplots(len(MODELS), 1, figsize=(WIDTH_IN, sum(ratios)),
-                                 gridspec_kw=dict(height_ratios=ratios, hspace=0.12))
+        counts[fname[:-4]] = {m: dict(zip(("correct", "fp", "missed"), map(len, dets[m][iid]))) for m in MODELS}
+        panel_h = (ymax - ymin) / W * WIDTH_IN
+        gap, top = 0.30, 0.33
+        fig_h = len(MODELS) * panel_h + (len(MODELS) - 1) * gap + top
+        fig, axes = plt.subplots(len(MODELS), 1, figsize=(WIDTH_IN, fig_h),
+                                 gridspec_kw=dict(hspace=gap / panel_h))
         for ax, m in zip(axes, MODELS):
             tp, fp, missed = dets[m][iid]
             ax.imshow(im)
@@ -82,17 +86,18 @@ def main():
             for d in tp:
                 draw_box(ax, d["bbox"], "dodgerblue", 1.0, "-")
             for d in fp:
-                draw_box(ax, d["bbox"], "red", 1.3, "-", f'{NAMES[d["category_id"]]} {d["score"]:.2f}', ymin, 6.5)
+                draw_box(ax, d["bbox"], "red", 1.3, "-", f'{NAMES[d["category_id"]]} {d["score"]:.2f}', ymin, 6.5, 38)
             for g in missed:
                 draw_box(ax, g["bbox"], "orange", 1.6, "-",
-                         NAMES[g["category_id"]], ymin, 6.5)
+                         NAMES[g["category_id"]], ymin, 6.5, 24)
             head = f"KITTI {fname[:-4]}: " if m == MODELS[0] else ""
             ax.set_title(f"{head}{LABEL[m]}: {len(tp)} correct, {len(fp)} false positives, {len(missed)} missed",
-                         fontsize=7.5, loc="left", pad=2)
-        fig.subplots_adjust(left=0.005, right=0.995, top=0.97, bottom=0.005)
+                         fontsize=7.5, loc="left", pad=6)
+        fig.subplots_adjust(left=0.005, right=0.995, top=1 - top / fig_h, bottom=0.005)
         fig.savefig(OUT / p.name, dpi=220)
         plt.close(fig)
         print(f"{p.name}: crop y {ymin:.0f}-{ymax:.0f} of {H}")
+    (SRC / "counts.json").write_text(json.dumps(counts, indent=2))
 
 
 if __name__ == "__main__":

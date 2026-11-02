@@ -27,10 +27,10 @@ def m3(m, ds):
     return R[(m, ds)]["metrics"]["3class_person_car_truck"]
 
 
-def bar_labels(ax, bars, fs=7.5):
+def bar_labels(ax, bars, fs=7.5, rot=0):
     for b in bars:
         ax.text(b.get_x() + b.get_width() / 2, b.get_height() + 0.005,
-                f"{b.get_height():.3f}", ha="center", va="bottom", fontsize=fs)
+                f"{b.get_height():.3f}", ha="center", va="bottom", fontsize=fs, rotation=rot)
 
 
 # ---- Figure 1: overall 3-class AP, COCO vs KITTI ----
@@ -61,12 +61,12 @@ for ax, cls in zip(axes, classes):
     for i, ds in enumerate(["coco", "kitti"]):
         vals = [m3(m, ds)["per_class_AP"][cls] for m in MODELS]
         bars = ax.bar(x + (i - 0.5) * w, vals, w, label=ds.upper(), color=DS_COLOR[ds])
-        bar_labels(ax, bars, 6.3)
+        bar_labels(ax, bars, 6.5, 90)
     ax.set_xticks(x)
     ax.set_xticklabels([LABEL[m] for m in MODELS], rotation=20, fontsize=7)
     ax.set_title(cls + (" (n=223 in KITTI, noisy)" if cls == "truck" else ""))
 axes[0].set_ylabel("AP@[.50:.95]")
-axes[0].set_ylim(0, 0.75)
+axes[0].set_ylim(0, 0.88)
 axes[0].legend()
 fig.suptitle("Per-class AP (3-class): person and truck degrade; car is flat overall", fontsize=9.5)
 fig.tight_layout()

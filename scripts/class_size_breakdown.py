@@ -23,7 +23,7 @@ def fmt(v, n):
     return s + ("*" if n < 30 else " ")  # * = fewer than 30 GT objects, unreliable
 
 
-rows = []
+rows, rows_full = [], []
 for ds, path in GT.items():
     with redirect_stdout(io.StringIO()):
         gt = COCO(str(path))
@@ -50,6 +50,9 @@ for ds, path in GT.items():
             rows.append(dict(dataset=ds, model=m, cls=cname, AP=round(st[0], 4),
                              AP_small=round(st[3], 4), AP_medium=round(st[4], 4),
                              AP_large=round(st[5], 4), n_small=ns[0], n_medium=ns[1], n_large=ns[2]))
+            rows_full.append(dict(dataset=ds, model=m, cls=cname, AP=float(st[0]), AP_small=float(st[3]),
+                                  AP_medium=float(st[4]), AP_large=float(st[5]),
+                                  n_small=ns[0], n_medium=ns[1], n_large=ns[2]))
             print(f"{cname:>7} {m:>9} {fmt(st[0], 99)} {fmt(st[3], ns[0])} {fmt(st[4], ns[1])} "
                   f"{fmt(st[5], ns[2])}   {ns[0]}/{ns[1]}/{ns[2]}")
 
@@ -58,3 +61,9 @@ with open(ROOT / "results" / "class_size_ap.csv", "w", newline="") as fh:
     w.writeheader()
     w.writerows(rows)
 print("\nWrote results/class_size_ap.csv")
+# Unrounded values (new file); the report builds its tables from these to avoid double rounding.
+with open(ROOT / "results" / "class_size_ap_full.csv", "w", newline="") as fh:
+    w = csv.DictWriter(fh, fieldnames=list(rows_full[0].keys()))
+    w.writeheader()
+    w.writerows(rows_full)
+print("Wrote results/class_size_ap_full.csv")
